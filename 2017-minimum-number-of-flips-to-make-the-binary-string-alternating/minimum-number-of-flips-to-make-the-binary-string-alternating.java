@@ -1,35 +1,60 @@
 class Solution {
     public int minFlips(String s) {
         int n = s.length();
-        s = s + s;
 
-        int diff1 = 0; 
-        int diff2 = 0;
-        int ans = Integer.MAX_VALUE;
-        int left = 0;
+        int cost1 = 0;
+        int cost2 = 0;
 
-        for(int right=0;right<2*n;right++){
-            char e1 = (right%2==0) ? '0':'1';
-            char e2 = (right%2==0) ? '1':'0';
-
-            if(s.charAt(right)!=e1) diff1++;
-            if(s.charAt(right)!=e2) diff2++;
-
-            if(right-left+1>n){
-                char le1 = (left%2==0) ? '0':'1';
-                char le2 = (left%2==0) ? '1':'0';
-
-                if(s.charAt(left)!=le1) diff1--;
-                if(s.charAt(left)!=le2) diff2--;
-
-                left++;
-            }
-
-            if(right - left + 1 == n){
-                ans = Math.min(ans, Math.min(diff1,diff2));
+        for (int i = 0; i < n; i++) {
+            if (i % 2 == 0) {
+                if (s.charAt(i) == '1')
+                    cost1++;
+                else
+                    cost2++;
+            } else {
+                if (s.charAt(i) == '0')
+                    cost1++;
+                else
+                    cost2++;
             }
         }
 
-        return ans;
+        int result = Math.min(cost1, cost2);
+
+        if (n % 2 == 1) {
+            String doubled = s + s;
+
+            for (int i = 1; i < n; i++) {
+                char leaving = doubled.charAt(i - 1);
+                char entering = doubled.charAt(i + n - 1);
+
+                if ((i - 1) % 2 == 0) {
+                    if (leaving == '1')
+                        cost1--;
+                    else
+                        cost2--;
+                } else {
+                    if (leaving == '0')
+                        cost1--;
+                    else
+                        cost2--;
+                }
+
+                if ((i + n - 1) % 2 == 0) {
+                    if (entering == '1')
+                        cost1++;
+                    else
+                        cost2++;
+                } else {
+                    if (entering == '0')
+                        cost1++;
+                    else
+                        cost2++;
+                }
+
+                result = Math.min(result, Math.min(cost1, cost2));
+            }
+        }
+        return result;
     }
 }
