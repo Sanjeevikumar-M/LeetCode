@@ -1,58 +1,27 @@
 class Solution {
-
-    int MOD = 1_000_000_007;
-    int[][][][] memo;
-
     public int numberOfStableArrays(int zero, int one, int limit) {
-        memo = new int[zero + 1][one + 1][2][limit + 1];
+        final int mod = 1_000_000_007;
+        int L = limit + 1;
 
-        for (int z = 0; z <= zero; z++)
-            for (int o = 0; o <= one; o++)
-                for (int l = 0; l < 2; l++)
-                    for (int c = 0; c <= limit; c++)
-                        memo[z][o][l][c] = -1;
+        int[][] dp0 = new int[zero + 1][one + 1]; // i 0s + j 1s ending with 0
+        int[][] dp1 = new int[zero + 1][one + 1]; // i 0s + j 1s ending with 1
 
-        long ans = 0;
+        // Base cases: only zeros or only ones => only one string if len <= min(limit, zero/one)
+        for (int i = 1; i <= Math.min(zero, limit); ++i) dp0[i][0] = 1;
+        for (int j = 1; j <= Math.min(one, limit); ++j) dp1[0][j] = 1;
 
-        if (zero > 0)
-            ans = (ans + dfs(zero - 1, one, 0, 1, limit)) % MOD;
+        // DP iterations
+        for (int i = 1; i <= zero; ++i) {
+            for (int j = 1; j <= one; ++j) {
+                dp0[i][j] = (dp0[i - 1][j] + dp1[i - 1][j] - (i >= L ? dp1[i - L][j] : 0)) % mod;
+                dp1[i][j] = (dp1[i][j - 1] + dp0[i][j - 1] - (j >= L ? dp0[i][j - L] : 0)) % mod;
 
-        if (one > 0)
-            ans = (ans + dfs(zero, one - 1, 1, 1, limit)) % MOD;
-
-        return (int) ans;
-    }
-
-    int dfs(int z, int o, int last, int count, int limit) {
-
-        if (z == 0 && o == 0)
-            return 1;
-
-        if (memo[z][o][last][count] != -1)
-            return memo[z][o][last][count];
-
-        long res = 0;
-
-        // place 0
-        if (z > 0) {
-            if (last == 0) {
-                if (count < limit)
-                    res += dfs(z - 1, o, 0, count + 1, limit);
-            } else {
-                res += dfs(z - 1, o, 0, 1, limit);
+                // Fix negatives
+                dp0[i][j] = (dp0[i][j] + mod) % mod;
+                dp1[i][j] = (dp1[i][j] + mod) % mod;
             }
         }
 
-        // place 1
-        if (o > 0) {
-            if (last == 1) {
-                if (count < limit)
-                    res += dfs(z, o - 1, 1, count + 1, limit);
-            } else {
-                res += dfs(z, o - 1, 1, 1, limit);
-            }
-        }
-
-        return memo[z][o][last][count] = (int)(res % MOD);
+        return (dp0[zero][one] + dp1[zero][one]) % mod;
     }
 }
