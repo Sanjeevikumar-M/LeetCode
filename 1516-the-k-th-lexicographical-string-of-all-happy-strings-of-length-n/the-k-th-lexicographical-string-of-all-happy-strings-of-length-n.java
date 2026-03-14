@@ -1,29 +1,40 @@
-import java.util.*;
-
 class Solution {
-    List<String> result = new ArrayList<>();
+
+    private static char[] ALLOWED_LETTERS = { 'a', 'b', 'c' };
+
+    private int happyStringCount;
+    private String kthHappyString;
 
     public String getHappyString(int n, int k) {
-        backtrack(n, "");
-        if (k > result.size()) {
-            return "";
-        }
-        return result.get(k - 1);
+        this.happyStringCount = 0;
+        this.kthHappyString = "";
+        kthHappyStringHelper(new StringBuilder(), n, k);
+        return happyStringCount >= k ? kthHappyString : "";
     }
 
-    private void backtrack(int n, String current) {
-        if (current.length() == n) {
-            result.add(current);
+    private void kthHappyStringHelper(StringBuilder currStr, int n, int k) {
+
+        int currStrSize = currStr.length();
+
+        if (currStrSize == n) {
+            happyStringCount++;
+            if (happyStringCount == k) {
+                kthHappyString = currStr.toString();
+            }
             return;
         }
 
-        char[] chars = {'a', 'b', 'c'};
+        for (char c : ALLOWED_LETTERS) {
 
-        for (char c : chars) {
-            if (current.length() > 0 && current.charAt(current.length() - 1) == c) {
+            if (currStrSize > 0 && c == currStr.charAt(currStrSize - 1))
                 continue;
-            }
-            backtrack(n, current + c);
+
+            currStr.append(c);
+            kthHappyStringHelper(currStr, n, k);
+            currStr.deleteCharAt(currStrSize);
+
+            if (happyStringCount == k)
+                return;
         }
     }
 }
