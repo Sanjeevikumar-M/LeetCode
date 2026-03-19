@@ -1,30 +1,27 @@
-import java.util.*;
-
-public class Solution {
-    public static List<String> fizzBuzz(int n) {
-        List<String> result = new ArrayList<>();
-
-        int fizz = 3, buzz = 5;
-
+class Solution {
+    public List<String> fizzBuzz(int n) {
+        List<String> answers = new ArrayList<>(n);
         for (int i = 1; i <= n; i++) {
-            fizz--;
-            buzz--;
+            boolean divisibleBy3 = i % 3 == 0;
+            boolean divisibleBy5 = i % 5 == 0;
+            StringBuilder word = new StringBuilder();
 
-            if (fizz == 0 && buzz == 0) {
-                result.add("FizzBuzz");
-                fizz = 3;
-                buzz = 5;
-            } else if (fizz == 0) {
-                result.add("Fizz");
-                fizz = 3;
-            } else if (buzz == 0) {
-                result.add("Buzz");
-                buzz = 5;
-            } else {
-                result.add(String.valueOf(i));
+            if (divisibleBy3) {
+                word = word.append("Fizz");
             }
-        }
 
-        return result;
+            if (divisibleBy5) {
+                word = word.append("Buzz");
+            }
+
+            if (word.isEmpty()) {
+                word = word.append(i);
+            }
+
+            answers.add(word.toString());
+        }
+        return answers;
     }
+
+    
 }
