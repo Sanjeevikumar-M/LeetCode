@@ -4,7 +4,7 @@ class Solution {
 
         int max = 0;
         for(int c:candies){
-            max = Math.max(max,c);
+            if(max<c) max = c;
         }        
         for(int c:candies){
             result.add(c+extraCandies >= max);
