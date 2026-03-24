@@ -1,44 +1,36 @@
 class Solution {
-    public int[][] constructProductMatrix(int[][] grid) {
-        int n = grid.length;
-        int m = grid[0].length;
-        int mod = 12345;
-
-        int size = n * m;
-        int[] arr = new int[size];
-
-        // Step 1: Flatten
-        int idx = 0;
-        for (int[] row : grid) {
-            for (int val : row) {
-                arr[idx++] = val % mod;
+    public int[][] constructProductMatrix(int[][] g) {
+        int m= g.length;
+        int n =g[0].length;
+        int size =m*n;
+        int mod =12345;
+        int a[] =new int[size];
+        long p[]= new long[size];
+        long s[]= new long[size];
+        p[0]= g[0][0];
+        int idx=0;
+        for(int i=0;i<m;i++){
+            for(int j=0;j<n;j++){
+                a[idx++] =g[i][j];
             }
         }
-
-        // Step 2: Prefix
-        int[] prefix = new int[size];
-        prefix[0] = 1;
-        for (int i = 1; i < size; i++) {
-            prefix[i] = (prefix[i - 1] * arr[i - 1]) % mod;
+        p[0] =1;
+        for(int i=1;i<p.length;i++){
+            p[i] =(p[i-1]*a[i-1])%mod;
         }
-
-        // Step 3: Suffix
-        int[] suffix = new int[size];
-        suffix[size - 1] = 1;
-        for (int i = size - 2; i >= 0; i--) {
-            suffix[i] = (suffix[i + 1] * arr[i + 1]) % mod;
+        s[s.length-1]= 1;
+        for(int i=a.length-2;i>=0;i--){
+            s[i]= (a[i+1]*s[i+1])%mod;
         }
-
-        // Step 4: Result
-        int[][] result = new int[n][m];
-        idx = 0;
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < m; j++) {
-                result[i][j] = (prefix[idx] * suffix[idx]) % mod;
+        idx=0;
+        
+        for(int i=0;i<m;i++){
+            for(int j=0;j<n;j++){
+                g[i][j]=(int)(p[idx]*s[idx])%mod;
                 idx++;
             }
         }
-
-        return result;
+        return g;
+        
     }
 }
