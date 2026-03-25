@@ -1,39 +1,30 @@
 class Solution {
     public boolean canPartitionGrid(int[][] grid) {
-        int m = grid.length;
-        int n = grid[0].length;
-
+        final long[] rowSum = new long[grid.length];
+        long sum = 0;
+        for (int i = 0; i < rowSum.length; ++i) {
+            for (final int n : grid[i]) {
+                rowSum[i] += n;
+            }
+            sum += rowSum[i];
+        }
+        if ((sum % 2) != 0) {
+            return false;
+        }
+        sum /= 2;
         long total = 0;
-
-        // Step 1: Compute total sum
-        for (int i = 0; i < m; i++) {
-            for (int j = 0; j < n; j++) {
+        for (int i = 0; i < rowSum.length - 1 && total < sum; ++i) {
+            total += rowSum[i];
+        }
+        if (total == sum) {
+            return true;
+        }
+        total = 0;
+        for (int j = 0; j < grid[0].length - 1 && total < sum; ++j) {
+            for (int i = 0; i < grid.length; ++i) {
                 total += grid[i][j];
             }
         }
-
-        // Step 2: Check horizontal cuts
-        long rowSum = 0;
-        for (int i = 0; i < m - 1; i++) {
-            for (int j = 0; j < n; j++) {
-                rowSum += grid[i][j];
-            }
-            if (rowSum == total - rowSum) {
-                return true;
-            }
-        }
-
-        // Step 3: Check vertical cuts
-        long colSum = 0;
-        for (int j = 0; j < n - 1; j++) {
-            for (int i = 0; i < m; i++) {
-                colSum += grid[i][j];
-            }
-            if (colSum == total - colSum) {
-                return true;
-            }
-        }
-
-        return false;
+        return total == sum;
     }
 }
