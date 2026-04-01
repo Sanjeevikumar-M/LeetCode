@@ -1,62 +1,43 @@
 class Solution {
-    static class Robot{
-        int pos, health, index;
-        char dir;
-
-        Robot(int p,int h,char d,int i){
-            pos=p;
-            health =h;
-            dir=d;
-            index=i;
-        }
-    }
     public List<Integer> survivedRobotsHealths(int[] positions, int[] healths, String directions) {
         int n = positions.length;
+        Integer[] indices = new Integer[n];
+        for (int i = 0; i < n; i++)
+            indices[i] = i;
 
-        Robot[] robots = new Robot[n];
-        for(int i=0;i<n;i++){
-            robots[i] = new Robot(positions[i], healths[i], directions.charAt(i), i);
-        }
+        Arrays.sort(indices, (a, b) -> positions[a] - positions[b]);
 
-        Arrays.sort(robots,(a,b) -> a.pos -b.pos);
+        int[] st = new int[n];
+        int top = -1;
 
-        Stack<Robot> stack = new Stack<>();
-
-        for(Robot curr:robots){
-            if(curr.dir=='R'){
-                stack.push(curr);
-            }else{
-                while(!stack.isEmpty() && stack.peek().dir=='R'){
-                    Robot top = stack.peek();
-
-                    if(top.health<curr.health){
-                        stack.pop();
-                        curr.health--;
-                    }else if(top.health>curr.health){
-                        top.health--;
-                        curr=null;
-                        break;
-                    }else{
-                        stack.pop();
-                        curr=null;
-                        break;
+        for (int idx : indices) {
+            if (directions.charAt(idx) == 'R') {
+                st[++top] = idx; // push right-moving robot
+            } else {
+                while (top >= 0 && healths[idx] > 0) {
+                    int rightRobot = st[top]; // peek top
+                    if (healths[rightRobot] < healths[idx]) {
+                        healths[rightRobot] = 0;
+                        healths[idx]--;
+                        top--; // pop
+                    } else if (healths[rightRobot] > healths[idx]) {
+                        healths[idx] = 0;
+                        healths[rightRobot]--;
+                    } else {
+                        healths[rightRobot] = 0;
+                        healths[idx] = 0;
+                        top--; // pop
                     }
-                }
-                if(curr!=null){
-                    stack.push(curr);
                 }
             }
         }
 
-        List<Robot> survivors = new ArrayList<>(stack);
-
-        survivors.sort(Comparator.comparing(r->r.index));
-
+        // Collect survivors from healths array
         List<Integer> result = new ArrayList<>();
-        for(Robot r:survivors){
-            result.add(r.health);
+        for (int i = 0; i < n; i++) {
+            if (healths[i] > 0)
+                result.add(healths[i]);
         }
-
         return result;
     }
 }
