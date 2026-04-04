@@ -1,26 +1,46 @@
 class Solution {
     public String decodeCiphertext(String encodedText, int rows) {
-        if(rows==1) return encodedText;
+        if (rows == 1) return encodedText;
+        int encodedSize = encodedText.length();
+        int columns = encodedSize/rows;
+        char[][] matrix = new char[rows][columns];
 
-        int n = encodedText.length();
-        int cols = n/rows;
-
-        StringBuilder result = new StringBuilder();
-
-        for(int startCol = 0;startCol < cols; startCol++){
-            int i=0,j=startCol;
-            while(i<rows && j<cols){
-                result.append(encodedText.charAt(i*cols + j));
-                i++;
-                j++;
+        int c = 0;
+        for (int i = 0; i < rows; i++) {
+            if (c == encodedSize) break;
+            for (int j = 0; j < columns; j++) {
+                if (c == encodedSize) break;
+                matrix[i][j] = encodedText.charAt(c);
+                c++;
             }
         }
 
-        int end = result.length() - 1;
-        while(end>=0 && result.charAt(end)==' '){
-            end--;
-        }
+        StringBuilder originalText = new StringBuilder();
+        
+        int row = 0, column = 0;
+        int columnCounter = 0;
+        while (column < columns) {
+            char character = matrix[row][column];
+            if (character == '\0') break;
+            originalText.append(character);
+            row++;
+            column++;
+            if (row == rows) {
+                row = 0;
+                columnCounter++;
+                column = columnCounter;
+            };
 
-        return result.substring(0, end+1);
+        }
+        int limit = originalText.length();
+        for (int i = originalText.length() - 1; i >= 0; i--) {
+            if (originalText.charAt(i) == ' ') {
+                limit--;
+            } else {
+                break;
+            }
+        }
+        originalText.setLength(limit);
+        return originalText.toString();
     }
 }
