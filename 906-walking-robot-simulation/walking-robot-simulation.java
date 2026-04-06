@@ -1,52 +1,47 @@
-import java.util.*;
-
 class Solution {
-    public int robotSim(int[] commands, int[][] obstacles) {
-        
-        // Store obstacles in HashSet
-        Set<String> set = new HashSet<>();
-        for (int[] obs : obstacles) {
-            set.add(obs[0] + "," + obs[1]);
+    private static final class Coord {
+        private int x, y;
+        private Coord(int x, int y) {
+            this.x = x;
+            this.y = y;
         }
 
-        // Directions: North, East, South, West
-        int[] dx = {0, 1, 0, -1};
-        int[] dy = {1, 0, -1, 0};
+        private int getDist() {
+            return x * x + y * y;
+        }
 
-        int dir = 0; // start facing North
-        int x = 0, y = 0;
-        int maxDist = 0;
-
-        for (int cmd : commands) {
-            
-            if (cmd == -1) {
-                // turn right
-                dir = (dir + 1) % 4;
-            } 
-            else if (cmd == -2) {
-                // turn left
-                dir = (dir + 3) % 4;
-            } 
+        @Override
+        public boolean equals(Object other) {
+            if(!(other instanceof Coord coord)) return false;
+            return x == coord.x && y == coord.y;
+        }
+        @Override
+        public int hashCode() {
+            return x * 31 + y;
+        }
+    }
+    private static final int[] dx = {0, 1, 0, -1}, dy = {1, 0, -1, 0};
+    public int robotSim(int[] commands, int[][] obstacles) {
+        int dir = 0, max = 0;
+        Set<Coord> invalid = new HashSet<>(obstacles.length, 1.0f);
+        for(int[] x : obstacles) invalid.add(new Coord(x[0], x[1]));
+        Coord current = new Coord(0, 0);
+        for(int command : commands) {
+            if(command == -1) dir = dir == 3 ? 0 : dir + 1;
+            else if(command == -2) dir = dir == 0 ? 3 : dir - 1;
             else {
-                // move step by step
-                for (int i = 0; i < cmd; i++) {
-                    int nx = x + dx[dir];
-                    int ny = y + dy[dir];
-
-                    // check obstacle
-                    if (set.contains(nx + "," + ny)) {
+                for(int i = 0; i < command; i++) {
+                    current.x += dx[dir];
+                    current.y += dy[dir];
+                    if(invalid.contains(current)) {
+                        current.x -= dx[dir];
+                        current.y -= dy[dir];
                         break;
                     }
-
-                    x = nx;
-                    y = ny;
-
-                    // update max distance
-                    maxDist = Math.max(maxDist, x * x + y * y);
                 }
+                max = Math.max(max, current.getDist());
             }
         }
-
-        return maxDist;
+        return max;
     }
 }
