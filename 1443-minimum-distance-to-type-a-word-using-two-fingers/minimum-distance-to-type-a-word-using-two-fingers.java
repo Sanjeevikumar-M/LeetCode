@@ -1,63 +1,31 @@
 class Solution {
-
     public int minimumDistance(String word) {
         int n = word.length();
-
-        // dp[i][j] = min cost where fingers are at i and j
-        int[][] dp = new int[27][27];
-
-        for (int i = 0; i < 27; i++) {
-            for (int j = 0; j < 27; j++) {
-                dp[i][j] = Integer.MAX_VALUE;
+        if(n < 3) return 0;
+        
+        char[] arr = word.toCharArray();
+        int[] store = new int[27];
+        for(int i=0; i<27; ++i) store[i] = Integer.MAX_VALUE;
+        
+        store[26] = dist(arr[1], arr[0]);
+        store[arr[0]-'A'] = 0;
+        for(int k=2; k<n; ++k) {
+            int delta = dist(arr[k], arr[k-1]), min = store[26];
+            for(int i=0; i<27; ++i) {
+                if(store[i] < min) min = Math.min(min, store[i] + dist(arr[k], (char) (i + 'A')));
+                if(store[i] < Integer.MAX_VALUE) store[i] += delta;
             }
+            store[arr[k-1]-'A'] = Math.min(store[arr[k-1]-'A'], min);
         }
-
-        dp[26][26] = 0; // 26 means no finger placed yet
-
-        for (char ch : word.toCharArray()) {
-            int cur = ch - 'A';
-            int[][] newDp = new int[27][27];
-
-            for (int i = 0; i < 27; i++) {
-                for (int j = 0; j < 27; j++) {
-                    newDp[i][j] = Integer.MAX_VALUE;
-                }
-            }
-
-            for (int i = 0; i < 27; i++) {
-                for (int j = 0; j < 27; j++) {
-                    if (dp[i][j] == Integer.MAX_VALUE) continue;
-
-                    // Move finger1 to cur
-                    int cost1 = dp[i][j] + dist(i, cur);
-                    newDp[cur][j] = Math.min(newDp[cur][j], cost1);
-
-                    // Move finger2 to cur
-                    int cost2 = dp[i][j] + dist(j, cur);
-                    newDp[i][cur] = Math.min(newDp[i][cur], cost2);
-                }
-            }
-
-            dp = newDp;
-        }
-
+        
         int ans = Integer.MAX_VALUE;
-
-        for (int i = 0; i < 27; i++) {
-            for (int j = 0; j < 27; j++) {
-                ans = Math.min(ans, dp[i][j]);
-            }
-        }
-
+        for(int x: store) ans = Math.min(ans, x);
+        
         return ans;
     }
-
-    private int dist(int a, int b) {
-        if (a == 26) return 0;
-
-        int x1 = a / 6, y1 = a % 6;
-        int x2 = b / 6, y2 = b % 6;
-
-        return Math.abs(x1 - x2) + Math.abs(y1 - y2);
+    
+    private int dist(char a, char b) {
+        int i = a - 'A', j = b - 'A';
+        return Math.abs(i/6 - j/6) + Math.abs(i%6 - j%6);
     }
 }
