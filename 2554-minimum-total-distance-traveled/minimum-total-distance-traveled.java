@@ -1,39 +1,26 @@
-import java.util.*;
-
 class Solution {
-    public long minimumTotalDistance(List<Integer> robot, int[][] factory) {
-        Collections.sort(robot);
-        Arrays.sort(factory, (a, b) -> a[0] - b[0]);
-
-        int n = robot.size();
-        int m = factory.length;
-
-        Long[][] dp = new Long[n + 1][m + 1];
-
-        return solve(0, 0, robot, factory, dp);
-    }
-
-    private long solve(int i, int j, List<Integer> robot, int[][] factory, Long[][] dp) {
-        // all robots repaired
-        if (i == robot.size()) return 0;
-
-        // no factories left but robots remain
-        if (j == factory.length) return Long.MAX_VALUE / 2;
-
-        if (dp[i][j] != null) return dp[i][j];
-
-        long res = solve(i, j + 1, robot, factory, dp); // skip this factory
-
-        long cost = 0;
-        int factoryPos = factory[j][0];
-        int limit = factory[j][1];
-
-        // assign k robots to this factory
-        for (int k = 0; k < limit && i + k < robot.size(); k++) {
-            cost += Math.abs(robot.get(i + k) - factoryPos);
-            res = Math.min(res, cost + solve(i + k + 1, j + 1, robot, factory, dp));
+    public long minimumTotalDistance(List<Integer> r, int[][] f) {
+        Collections.sort(r);
+        Arrays.sort(f, (x, y) -> x[0] - y[0]);
+        int R = r.size();
+        int F = f.length;
+        long[][] dp = new long[R + 1][F + 1];
+        for (int i = 0; i < R; i++) dp[i][F] = Long.MAX_VALUE / 4;
+        for (int j = F - 1; j >= 0; j--) {
+            long distSum = 0;
+            ArrayDeque<long[]> dq = new ArrayDeque<>();
+            dq.addLast(new long[]{R, 0});
+            for (int i = R - 1; i >= 0; i--) {
+                distSum += Math.abs(r.get(i) - f[j][0]);
+                while (!dq.isEmpty() && dq.peekFirst()[0] > i + f[j][1])
+                    dq.pollFirst();
+                long val = dp[i][j + 1] - distSum;
+                while (!dq.isEmpty() && dq.peekLast()[1] >= val)
+                    dq.pollLast();
+                dq.addLast(new long[]{i, val});
+                dp[i][j] = dq.peekFirst()[1] + distSum;
+            }
         }
-
-        return dp[i][j] = res;
+        return dp[0][0];
     }
 }
