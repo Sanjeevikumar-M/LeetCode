@@ -1,30 +1,39 @@
 import java.util.*;
 
 class Solution {
-    public int minMirrorPairDistance(int[] nums) {  // ✅ FIXED NAME
-        Map<Integer, Integer> map = new HashMap<>();
-        int ans = Integer.MAX_VALUE;
+    public int minMirrorPairDistance(int[] nums) {
+        int n = nums.length; 
+        int ans = n; 
 
-        for (int i = 0; i < nums.length; i++) {
-            int num = nums[i];
+        // Map: key = reverse(nums[i]), value = index i (latest index)
+        Map<Integer, Integer> lastIndex = new HashMap<>(n, 1.0f);
 
-            if (map.containsKey(num)) {
-                ans = Math.min(ans, i - map.get(num));
+        for (int j = 0; j < n; j++) {
+
+            // Check if current number matches any previously stored reversed value
+            int x = nums[j];
+            Integer i = lastIndex.get(x); 
+
+            if (i != null) {  
+                int dist = j - i;  
+                ans = Math.min(ans, dist);  
             }
 
-            int rev = reverse(num);
-            map.put(rev, i);
+            // Compute reverse of current number
+            int t = x;
+            int rev = 0;
+
+            while (t > 0) {  
+                int digit = t % 10;  
+                rev = rev * 10 + digit;  
+                t = t / 10;  
+            }
+
+            // Store reversed number with current index
+            lastIndex.put(rev, j);
         }
 
-        return ans == Integer.MAX_VALUE ? -1 : ans;
-    }
-
-    private int reverse(int x) {
-        int rev = 0;
-        while (x > 0) {
-            rev = rev * 10 + (x % 10);
-            x /= 10;
-        }
-        return rev;
+        // Return result
+        return (ans < n) ? ans : -1;
     }
 }
