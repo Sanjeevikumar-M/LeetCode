@@ -1,24 +1,34 @@
 class Solution {
-    public List<String> twoEditWords(String[] queries, String[] dictionary) {
-        List<String> res = new ArrayList<>();
 
-        for(String q:queries){
-            for(String d: dictionary){
-                int diff = 0;
-                for(int i=0;i<q.length();i++){
-                    if(q.charAt(i)!=d.charAt(i)){
-                        diff++;
-                    }
-                    if(diff>2){
-                        break;
-                    }
+    boolean hasMatch(String query, String[] dictionary) {
+        boolean found = false;
+        for (String dict : dictionary) {
+            int diffMax = 2;
+            for (int i=0;i<dict.length();i++) {
+                if (dict.charAt(i) != query.charAt(i)) {
+                    diffMax--;
                 }
-                if(diff<=2){
-                    res.add(q);
+                if (diffMax < 0) {
                     break;
                 }
             }
+            if (diffMax >= 0) {
+                return true;
+            }
         }
-        return res;
+
+        return found;
+    }
+
+    public List<String> twoEditWords(String[] queries, String[] dictionary) {
+
+        List<String> result = new ArrayList<>();
+        for (String query : queries) {
+            if (hasMatch(query, dictionary)) {
+                result.add(query);
+            }
+        }
+
+        return result;
     }
 }
