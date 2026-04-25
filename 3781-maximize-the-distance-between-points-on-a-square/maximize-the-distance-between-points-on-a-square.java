@@ -1,92 +1,79 @@
-import java.util.*;
-
+// https://www.youtube.com/@0x3f
 class Solution {
     public int maxDistance(int side, int[][] points, int k) {
-        int n = points.length;
-
-        Arrays.sort(points, (a, b) -> Long.compare(map(a, side), map(b, side)));
-
-        int[][] arr = new int[2 * n][2];
-        for (int i = 0; i < n; i++) {
-            arr[i] = points[i];
-            arr[i + n] = points[i];
-        }
-
-        int low = 0, high = 2 * side, ans = 0;
-
-        while (low <= high) {
-            int mid = (low + high) >>> 1;
-            if (canPick(arr, n, k, mid)) {
-                ans = mid;
-                low = mid + 1;
+        long[] a = new long[points.length];
+        for (int i = 0; i < points.length; i++) {
+            int x = points[i][0];
+            int y = points[i][1];
+            if (x == 0) {
+                a[i] = y;
+            } else if (y == side) {
+                a[i] = side + x;
+            } else if (x == side) {
+                a[i] = side * 3L - y;
             } else {
-                high = mid - 1;
+                a[i] = side * 4L - x;
             }
         }
+        Arrays.sort(a);
 
-        return ans;
-    }
-
-    private long map(int[] p, int side) {
-        int x = p[0], y = p[1];
-
-        if (y == 0) return x;
-        if (x == side) return side + y;
-        if (y == side) return 3L * side - x;
-        return 4L * side - y;
-    }
-
-    private boolean canPick(int[][] arr, int n, int k, int d) {
-        int m = 2 * n;
-
-        int[] next = new int[m];
-        int j = 0;
-
-        // build next[] in O(n)
-        for (int i = 0; i < m; i++) {
-            if (j < i) j = i;
-            while (j < m && manhattan(arr[i], arr[j]) < d) j++;
-            next[i] = j;
-        }
-
-        // binary lifting
-        int LOG = 5; // since k <= 25
-        int[][] jump = new int[LOG][m];
-
-        for (int i = 0; i < m; i++) jump[0][i] = next[i];
-
-        for (int l = 1; l < LOG; l++) {
-            for (int i = 0; i < m; i++) {
-                int mid = jump[l - 1][i];
-                jump[l][i] = (mid < m) ? jump[l - 1][mid] : m;
+        int left = 1;
+        int right = side + 1;
+        while (left + 1 < right) {
+            int mid = (left + right) >>> 1;
+            if (check(a, side, k, mid)) {
+                left = mid;
+            } else {
+                right = mid;
             }
         }
+        return left;
+    }
 
-        // try ALL starts (this is required)
-        for (int i = 0; i < n; i++) {
-            int curr = i;
-            int need = k - 1;
+    private boolean check(long[] a, int side, int k, int low) {
+        int[] idx = new int[k];
+        long cur = a[0];
+        for (int j = 1; j < k; j++) {
+            int i = lowerBound(a, cur + low);
+            if (i == a.length) {
+                return false;
+            }
+            idx[j] = i;
+            cur = a[i];
+        }
+        if (cur - a[0] <= side * 4L - low) {
+            return true;
+        }
 
-            // jump k-1 steps
-            for (int l = 0; l < LOG; l++) {
-                if ((need & (1 << l)) != 0) {
-                    curr = jump[l][curr];
-                    if (curr >= i + n) break;
+        // 第一个指针移动到第二个指针的位置，就不用继续枚举了
+        int end0 = idx[1];
+        for (idx[0] = 1; idx[0] < end0; idx[0]++) {
+            for (int j = 1; j < k; j++) {
+                while (a[idx[j]] < a[idx[j - 1]] + low) {
+                    idx[j]++;
+                    if (idx[j] == a.length) {
+                        return false;
+                    }
                 }
             }
-
-            if (curr >= i + n) continue;
-
-            // check circular condition
-            if (manhattan(arr[i], arr[curr]) >= d) {
+            if (a[idx[k - 1]] - a[idx[0]] <= side * 4L - low) {
                 return true;
             }
         }
-
         return false;
     }
 
-    private int manhattan(int[] a, int[] b) {
-        return Math.abs(a[0] - b[0]) + Math.abs(a[1] - b[1]);
+    private int lowerBound(long[] nums, long target) {
+        int left = -1;
+        int right = nums.length;
+        while (left + 1 < right) {
+            int mid = (left + right) >>> 1;
+            if (nums[mid] >= target) {
+                right = mid;
+            } else {
+                left = mid;
+            }
+        }
+        return right;
     }
 }
