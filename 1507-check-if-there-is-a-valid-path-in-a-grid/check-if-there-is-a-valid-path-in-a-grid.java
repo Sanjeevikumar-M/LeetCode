@@ -1,61 +1,40 @@
-import java.util.*;
-
 class Solution {
+    static int LEFT = 0b0001, RIGHT = 0b0010, TOP = 0b0100, BOTTOM = 0b1000;
+    static int[] directions = { 0, LEFT|RIGHT, TOP|BOTTOM, LEFT|BOTTOM, BOTTOM|RIGHT, LEFT|TOP, TOP|RIGHT };
+
     public boolean hasValidPath(int[][] grid) {
+        int outDirection = directions[grid[0][0]];
+        return check(grid, outDirection & BOTTOM) || check(grid, outDirection & RIGHT);
+    }
+
+    boolean check(int[][] grid, int outDirection){
         int m = grid.length, n = grid[0].length;
-
-        // Directions: {dx, dy}
-        int[][] dirs = {
-            {0, -1}, // left
-            {0, 1},  // right
-            {-1, 0}, // up
-            {1, 0}   // down
-        };
-
-        // Allowed directions per street type
-        int[][][] moves = {
-            {},
-            {{0, -1}, {0, 1}},   // 1
-            {{-1, 0}, {1, 0}},   // 2
-            {{0, -1}, {1, 0}},   // 3
-            {{0, 1}, {1, 0}},    // 4
-            {{0, -1}, {-1, 0}},  // 5
-            {{0, 1}, {-1, 0}}    // 6
-        };
-
-        boolean[][] visited = new boolean[m][n];
-        Queue<int[]> q = new LinkedList<>();
-        q.offer(new int[]{0, 0});
-        visited[0][0] = true;
-
-        while (!q.isEmpty()) {
-            int[] curr = q.poll();
-            int i = curr[0], j = curr[1];
-
-            if (i == m - 1 && j == n - 1) return true;
-
-            int type = grid[i][j];
-
-            for (int[] d : moves[type]) {
-                int ni = i + d[0];
-                int nj = j + d[1];
-
-                if (ni < 0 || nj < 0 || ni >= m || nj >= n || visited[ni][nj])
-                    continue;
-
-                int nextType = grid[ni][nj];
-
-                // Check if next cell connects back
-                for (int[] back : moves[nextType]) {
-                    if (ni + back[0] == i && nj + back[1] == j) {
-                        visited[ni][nj] = true;
-                        q.offer(new int[]{ni, nj});
-                        break;
-                    }
-                }
+        int x = 0, y = 0, inDirection = 0;
+        while(true){
+            if(x == m -1 && y == n -1) return true;
+            if(outDirection == LEFT){
+                y--;
+                inDirection = RIGHT;
+            }else if(outDirection == RIGHT){
+                y++;
+                inDirection = LEFT;
+            }else if(outDirection == TOP){
+                x--;
+                inDirection = BOTTOM;
+            }else if(outDirection == BOTTOM){
+                x++;
+                inDirection = TOP;
+            }else{
+                return false;
             }
-        }
+            
+            if(x == 0 && y == 0) return false;
+            if(x < 0 || x >= m || y < 0 || y >= n) return false;
 
-        return false;
+            int nextDirection = directions[grid[x][y]];
+            outDirection = nextDirection & (~inDirection);
+            if(outDirection == nextDirection)
+                return false;
+        }
     }
 }
