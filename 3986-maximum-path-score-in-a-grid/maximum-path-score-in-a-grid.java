@@ -1,49 +1,45 @@
 class Solution {
-    public int maxPathScore(int[][] grid, int k) {
-        int m = grid.length, n = grid[0].length;
+    public int maxPathScore(int[][] grid, int K) {
+        if (minPathSum(grid) > K) {
+            return -1;
+        }
 
-        int[][][] dp = new int[m][n][k + 1];
-
-        for (int i = 0; i < m; i++)
-            for (int j = 0; j < n; j++)
-                for (int c = 0; c <= k; c++)
-                    dp[i][j][c] = -1;
-
-        dp[0][0][0] = 0;
+        int m = grid.length;
+        int n = grid[0].length;
+        K = Math.min(K, m + n - 2); 
+        int[][] f = new int[n + 1][K + 2];
+        for (int[] row : f) {
+            Arrays.fill(row, Integer.MIN_VALUE);
+        }
+        f[1][1] = 0;
 
         for (int i = 0; i < m; i++) {
             for (int j = 0; j < n; j++) {
-                for (int c = 0; c <= k; c++) {
-                    if (dp[i][j][c] == -1) continue;
-
-                    // down
-                    if (i + 1 < m) {
-                        int val = grid[i + 1][j];
-                        int cost = (val == 0) ? 0 : 1;
-                        if (c + cost <= k) {
-                            dp[i + 1][j][c + cost] =
-                                Math.max(dp[i + 1][j][c + cost], dp[i][j][c] + val);
-                        }
-                    }
-
-                    // right
-                    if (j + 1 < n) {
-                        int val = grid[i][j + 1];
-                        int cost = (val == 0) ? 0 : 1;
-                        if (c + cost <= k) {
-                            dp[i][j + 1][c + cost] =
-                                Math.max(dp[i][j + 1][c + cost], dp[i][j][c] + val);
-                        }
-                    }
+                int x = grid[i][j];
+                for (int k = Math.min(K, i + j); k >= 0; k--) { 
+                    int newK = x > 0 ? k - 1 : k;
+                    f[j + 1][k + 1] = Math.max(f[j + 1][newK + 1], f[j][newK + 1]) + x;
                 }
             }
         }
 
-        int ans = -1;
-        for (int c = 0; c <= k; c++) {
-            ans = Math.max(ans, dp[m - 1][n - 1][c]);
+        int ans = 0;
+        for (int x : f[n]) {
+            ans = Math.max(ans, x);
         }
-
         return ans;
+    }
+
+    private int minPathSum(int[][] grid) {
+        int n = grid[0].length;
+        int[] f = new int[n + 1];
+        Arrays.fill(f, Integer.MAX_VALUE);
+        f[1] = 0;
+        for (int[] row : grid) {
+            for (int j = 0; j < n; j++) {
+                f[j + 1] = Math.min(f[j], f[j + 1]) + Math.min(row[j], 1); 
+            }
+        }
+        return f[n];
     }
 }
