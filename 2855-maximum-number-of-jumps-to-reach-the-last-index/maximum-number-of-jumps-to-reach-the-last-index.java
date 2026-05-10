@@ -1,26 +1,28 @@
 class Solution {
     public int maximumJumps(int[] nums, int target) {
-        if(nums.length==2){
-            int dif = nums[1]-nums[0];
-                if((-1*target)<=dif && dif<=target){
-                    return 1;
-                }
-                else{
-                    return -1;
-                }
+        int n = nums.length;
+
+        // dp[i] = maximum jumps needed to reach index i
+        int[] dp = new int[n];
+
+        // initialize with -1 (unreachable)
+        for (int i = 0; i < n; i++) {
+            dp[i] = -1;
         }
-        int dp[]= new int[nums.length];
-        Arrays.fill(dp,Integer.MIN_VALUE);
-        dp[0]=0;
-        for(int i=0;i<nums.length-1;i++){
-            if(dp[i]==Integer.MIN_VALUE) continue;
-            for(int j=i+1;j<nums.length;j++){
-                int dif = nums[j]-nums[i];
-                if((-1*target)<=dif && dif<=target){
-                    dp[j]=Math.max(1+dp[i],dp[j]);
+
+        dp[0] = 0;
+
+        for (int j = 1; j < n; j++) {
+            for (int i = 0; i < j; i++) {
+
+                long diff = (long) nums[j] - nums[i];
+
+                if (diff >= -target && diff <= target && dp[i] != -1) {
+                    dp[j] = Math.max(dp[j], dp[i] + 1);
                 }
             }
         }
-        return dp[nums.length-1]==Integer.MIN_VALUE?-1:dp[nums.length-1];
+
+        return dp[n - 1];
     }
 }
