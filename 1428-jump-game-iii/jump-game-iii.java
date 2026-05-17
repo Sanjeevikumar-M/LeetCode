@@ -1,26 +1,23 @@
 class Solution {
+    List<Integer> visited = new ArrayList<Integer>();
+
     public boolean canReach(int[] arr, int start) {
-        boolean[] visited = new boolean[arr.length];
-        
-        return dfs(arr, start, visited);
-    }
-
-    private boolean dfs(int[] arr, int index, boolean[] visited) {
-        
-        // Out of bounds or already visited
-        if (index < 0 || index >= arr.length || visited[index]) {
+        if(start < 0 || start >= arr.length || visited.size() == arr.length){
             return false;
-        }
+        }    
 
-        // Reached value 0
-        if (arr[index] == 0) {
+        if(arr[start]==0){
             return true;
         }
 
-        visited[index] = true;
-
-        // Jump forward or backward
-        return dfs(arr, index + arr[index], visited) ||
-               dfs(arr, index - arr[index], visited);
+        else if(visited.contains(start) == false) {
+            visited.add(start);
+            if(arr[start] == 1 && arr[arr.length - 1] == 0) {
+                return true;
+            }  
+            return canReach(arr, start+arr[start]) || canReach(arr, start - arr[start]);
+        } else {
+            return false;
+        }
     }
 }
