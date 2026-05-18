@@ -1,68 +1,47 @@
 class Solution {
     public int minJumps(int[] arr) {
         int n = arr.length;
+        if(n==1) return 0;
 
-        if (n == 1) return 0;
-
-        // Store all indices having same value
-        Map<Integer, List<Integer>> map = new HashMap<>();
-
-        for (int i = 0; i < n; i++) {
-            map.computeIfAbsent(arr[i], k -> new ArrayList<>()).add(i);
+        HashMap<Integer, List<Integer>> map = new HashMap<>();
+        for(int i=0; i<n; i++) {
+            if(!map.containsKey(arr[i])) map.put(arr[i], new ArrayList<>());
+            map.get(arr[i]).add(i);
         }
 
         Queue<Integer> q = new LinkedList<>();
-        boolean[] visited = new boolean[n];
+        boolean[] vis = new boolean[n];
+        q.add(n-1);
+        vis[n-1]=true;
+        int count=0, x;
 
-        q.offer(0);
-        visited[0] = true;
+        while(!q.isEmpty()) {
+            int sz = q.size();
+            count++;
+            for(int k=0; k<sz; k++) {
+                int ind = q.poll();
+                
+                x=ind-1;
+                if(x==0) return count;
+                if(x>=0 && x<n && !vis[x]) {vis[x]=true; q.add(x);}
 
-        int steps = 0;
+                x=ind+1;
+                if(x==0) return count;
+                if(x>=0 && x<n && !vis[x]) {vis[x]=true; q.add(x);}
 
-        while (!q.isEmpty()) {
-
-            int size = q.size();
-
-            for (int s = 0; s < size; s++) {
-
-                int curr = q.poll();
-
-                // Reached last index
-                if (curr == n - 1) {
-                    return steps;
-                }
-
-                // Jump to curr - 1
-                if (curr - 1 >= 0 && !visited[curr - 1]) {
-                    visited[curr - 1] = true;
-                    q.offer(curr - 1);
-                }
-
-                // Jump to curr + 1
-                if (curr + 1 < n && !visited[curr + 1]) {
-                    visited[curr + 1] = true;
-                    q.offer(curr + 1);
-                }
-
-                // Jump to same value indices
-                if (map.containsKey(arr[curr])) {
-
-                    for (int next : map.get(arr[curr])) {
-
-                        if (!visited[next]) {
-                            visited[next] = true;
-                            q.offer(next);
-                        }
+                List<Integer> list = map.get(arr[ind]);
+                if(list!=null) {
+                for(int i : list){
+                    if(!vis[i]) {
+                        if(i==0) return count;
+                        vis[i]=true;
+                        q.add(i);
                     }
-
-                    // Important optimization
-                    map.remove(arr[curr]);
                 }
+                }
+                map.remove(arr[ind]);
             }
-
-            steps++;
         }
-
         return -1;
     }
 }
