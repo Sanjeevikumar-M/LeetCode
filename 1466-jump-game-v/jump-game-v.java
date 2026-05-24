@@ -1,47 +1,61 @@
 class Solution {
-
-    int[] dp;
-
     public int maxJumps(int[] arr, int d) {
         int n = arr.length;
-        dp = new int[n];
 
-        int ans = 1;
+        int[] left = new int[n];
+        int[] st = new int[n];
+        int top = -1;
 
         for (int i = 0; i < n; i++) {
-            ans = Math.max(ans, dfs(arr, d, i));
+            int x = arr[i];
+
+            while (top >= 0 && arr[st[top]] <= x) {
+                top--;
+            }
+
+            left[i] = top < 0 || i - st[top] > d ? -1 : st[top];
+
+            st[++top] = i;
+        }
+
+        int[] right = new int[n];
+        top = -1;
+
+        for (int i = n - 1; i >= 0; i--) {
+            int x = arr[i];
+
+            while (top >= 0 && arr[st[top]] <= x) {
+                top--;
+            }
+
+            right[i] = top < 0 || st[top] - i > d ? -1 : st[top];
+
+            st[++top] = i;
+        }
+
+        int[] memo = new int[n];
+
+        int ans = 0;
+
+        for (int i = 0; i < n; i++) {
+            ans = Math.max(ans, dfs(i, left, right, memo));
         }
 
         return ans;
     }
 
-    private int dfs(int[] arr, int d, int i) {
-
-        if (dp[i] != 0)
-            return dp[i];
-
-        int max = 1;
-
-        // LEFT
-        for (int j = i - 1; j >= Math.max(0, i - d); j--) {
-
-            // blocked
-            if (arr[j] >= arr[i])
-                break;
-
-            max = Math.max(max, 1 + dfs(arr, d, j));
+    private int dfs(int i, int[] left, int[] right, int[] memo) {
+        if (i < 0) {
+            return 0;
         }
 
-        // RIGHT
-        for (int j = i + 1; j <= Math.min(arr.length - 1, i + d); j++) {
-
-            // blocked
-            if (arr[j] >= arr[i])
-                break;
-
-            max = Math.max(max, 1 + dfs(arr, d, j));
+        if (memo[i] == 0) {
+            memo[i] = Math.max(
+                dfs(left[i], left, right, memo),
+                dfs(right[i], left, right, memo)
+            ) + 1;
         }
 
-        return dp[i] = max;
+        return memo[i];
     }
 }
