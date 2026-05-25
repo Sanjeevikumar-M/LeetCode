@@ -1,33 +1,29 @@
 class Solution {
     public boolean canReach(String s, int minJump, int maxJump) {
-        int n = s.length();
+        int start = 0, end = 0, len = s.length();
+        if(len == 0 || s.charAt(0) == '1' || s.charAt(len-1) == '1') {
+            return false;
+        }
+        boolean[] dp = new boolean[len];
+        dp[0] = true;
 
-        // If last position is '1', impossible to reach
-        if (s.charAt(n - 1) == '1') return false;
-
-        boolean[] reachable = new boolean[n];
-        reachable[0] = true;
-
-        int reachableCount = 0;
-
-        for (int i = 1; i < n; i++) {
-
-            // Add new index entering the sliding window
-            if (i - minJump >= 0 && reachable[i - minJump]) {
-                reachableCount++;
+        for(int i = 0; i < len; i++) {
+            if(!dp[i]) {
+                continue;
             }
 
-            // Remove old index leaving the sliding window
-            if (i - maxJump - 1 >= 0 && reachable[i - maxJump - 1]) {
-                reachableCount--;
-            }
+            start = Math.max(end + 1, i + minJump);
+            end = Math.min(len-1, i + maxJump);
 
-            // Current index is reachable
-            if (s.charAt(i) == '0' && reachableCount > 0) {
-                reachable[i] = true;
+            for(int j = start; j <= end; j++) {
+                if(s.charAt(j) == '0') {
+                    dp[j] = true;
+                }
+            }
+            if(dp[len-1]) {
+                return true;
             }
         }
-
-        return reachable[n - 1];
+        return dp[len-1];
     }
 }
