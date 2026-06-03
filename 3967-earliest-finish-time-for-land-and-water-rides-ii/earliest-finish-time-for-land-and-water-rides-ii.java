@@ -1,83 +1,22 @@
-import java.util.*;
-
 class Solution {
-    public int earliestFinishTime(int[] landStartTime, int[] landDuration,
-                                  int[] waterStartTime, int[] waterDuration) {
-
-        long ans = Math.min(
-                solve(landStartTime, landDuration, waterStartTime, waterDuration),
-                solve(waterStartTime, waterDuration, landStartTime, landDuration)
-        );
-
-        return (int) ans;
-    }
-
-    private long solve(int[] start1, int[] dur1,
-                       int[] start2, int[] dur2) {
-
-        int m = start2.length;
-
-        int[][] rides = new int[m][2];
+    public int earliestFinishTime(int[] landStartTime, int[] landDuration, int[] waterStartTime, int[] waterDuration) {
+        int n = landDuration.length;
+        int m = waterDuration.length;
+        int a1 = Integer.MAX_VALUE;
+        int a2 = Integer.MAX_VALUE;
+        for (int i = 0; i < n; i++) {
+            a1 = Math.min(a1, landStartTime[i] + landDuration[i]);
+        }
         for (int i = 0; i < m; i++) {
-            rides[i][0] = start2[i];
-            rides[i][1] = dur2[i];
+            a2 = Math.min(a2, waterStartTime[i] + waterDuration[i]);
         }
-
-        Arrays.sort(rides, Comparator.comparingInt(a -> a[0]));
-
-        int[] starts = new int[m];
-        long[] prefixMinDur = new long[m];
-        long[] suffixMinFinish = new long[m];
-
+        int ans = Integer.MAX_VALUE;
+        for (int i = 0; i < n; i++) {
+            ans = Math.min(ans, Math.max(a2, landStartTime[i]) + landDuration[i]);
+        }
         for (int i = 0; i < m; i++) {
-            starts[i] = rides[i][0];
+            ans = Math.min(ans, Math.max(a1, waterStartTime[i]) + waterDuration[i]);
         }
-
-        prefixMinDur[0] = rides[0][1];
-        for (int i = 1; i < m; i++) {
-            prefixMinDur[i] = Math.min(prefixMinDur[i - 1], rides[i][1]);
-        }
-
-        suffixMinFinish[m - 1] = (long) rides[m - 1][0] + rides[m - 1][1];
-        for (int i = m - 2; i >= 0; i--) {
-            suffixMinFinish[i] = Math.min(
-                    suffixMinFinish[i + 1],
-                    (long) rides[i][0] + rides[i][1]
-            );
-        }
-
-        long ans = Long.MAX_VALUE;
-
-        for (int i = 0; i < start1.length; i++) {
-            long finishFirst = (long) start1[i] + dur1[i];
-
-            int idx = upperBound(starts, (int) finishFirst);
-
-            if (idx > 0) {
-                ans = Math.min(ans, finishFirst + prefixMinDur[idx - 1]);
-            }
-
-            if (idx < m) {
-                ans = Math.min(ans, suffixMinFinish[idx]);
-            }
-        }
-
         return ans;
-    }
-
-    private int upperBound(int[] arr, int target) {
-        int l = 0, r = arr.length;
-
-        while (l < r) {
-            int mid = l + (r - l) / 2;
-
-            if (arr[mid] <= target) {
-                l = mid + 1;
-            } else {
-                r = mid;
-            }
-        }
-
-        return l;
     }
 }
