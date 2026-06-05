@@ -8,5 +8,3 @@ class Solution:
         for i in map:
             if map[i]==1:
                 return i
-        
-        return -1
