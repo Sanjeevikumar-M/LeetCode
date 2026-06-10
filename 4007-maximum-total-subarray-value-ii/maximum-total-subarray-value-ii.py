@@ -1,46 +1,65 @@
 import heapq
-import math
+from itertools import count as uid_counter
 
 class Solution:
     def maxTotalValue(self, nums: List[int], k: int) -> int:
-        n = len(nums)
+        n   = len(nums)
+        vis = set()
 
-        LOG = math.floor(math.log2(n)) + 1
-        st_max = [[0] * n for _ in range(LOG)]
-        st_min = [[0] * n for _ in range(LOG)]
-        
-        for j in range(n):
-            st_max[0][j] = nums[j]
-            st_min[0][j] = nums[j]
-            
-        for i in range(1, LOG):
-            for j in range(n - (1 << i) + 1):
-                st_max[i][j] = max(st_max[i-1][j], st_max[i-1][j + (1 << (i-1))])
-                st_min[i][j] = min(st_min[i-1][j], st_min[i-1][j + (1 << (i-1))])
-                
-        def query_value(l, r):
-            length = r - l + 1
-            i = math.floor(math.log2(length))
-            mx = max(st_max[i][l], st_max[i][r - (1 << i) + 1])
-            mn = min(st_min[i][l], st_min[i][r - (1 << i) + 1])
-            return mx - mn
+        # Sort indices by value (ascending), ties broken by index
+        ids = sorted(range(n), key=lambda x: (nums[x], x))
 
-        max_heap = []
-        for l in range(n):
-            val = query_value(l, n - 1)
-            heapq.heappush(max_heap, (-val, l, n - 1))
-            
-        total_value = 0
-        
-        for _ in range(k):
-            if not max_heap:
-                break
-                
-            neg_val, l, r = heapq.heappop(max_heap)
-            total_value += (-neg_val)
-            
-            if r > l:
-                next_val = query_value(l, r - 1)
-                heapq.heappush(max_heap, (-next_val, l, r - 1))
-                
-        return total_value
+        uid = uid_counter()   # tie-breaker for the heap
+
+        def compute_val(i, j, l, r):
+            """
+            Find the max-spread pair within position window (i, j) exclusive,
+            searching within ids[l..r].
+            Returns (val, i, j, l, r) or None if invalid / already visited.
+            """
+            if (i, j) in vis:
+                return None
+            vis.add((i, j))
+
+            # Advance l until ids[l] is strictly inside (i, j)
+            while l < n and (ids[l] <= i or ids[l] >= j):
+                l += 1
+            # Retreat r until ids[r] is strictly inside (i, j)
+            while r >= 0 and (ids[r] <= i or ids[r] >= j):
+                r -= 1
+
+            if l > r:
+                return None
+
+            val = nums[ids[r]] - nums[ids[l]]
+            return (val, i, j, l, r) if val > 0 else None
+
+        res = 0
+        pq  = []   # max-heap (negate val)
+
+        first = compute_val(-1, n, 0, n - 1)
+        if first:
+            val, i, j, l, r = first
+            heapq.heappush(pq, (-val, next(uid), i, j, l, r))
+
+        while pq and k > 0:
+            neg_val, _, i, j, l, r = heapq.heappop(pq)
+            val = -neg_val
+
+            # Positions of the min-value and max-value elements
+            ni = min(ids[l], ids[r])   # leftmost of the two extreme positions
+            nj = max(ids[l], ids[r])   # rightmost
+
+            # Number of (left, right) pairs with left in (i, ni] and right in [nj, j)
+            cnt  = min((ni - i) * (j - nj), k)
+            k   -= cnt
+            res += val * cnt
+
+            # Split into two sub-problems and push their best pairs
+            for entry in [compute_val(ni, j, l, r),
+                          compute_val(i, nj, l, r)]:
+                if entry:
+                    ev, ei, ej, el, er = entry
+                    heapq.heappush(pq, (-ev, next(uid), ei, ej, el, er))
+
+        return res
