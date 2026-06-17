@@ -1,13 +1,16 @@
 class Solution:
     def matchPlayersAndTrainers(self, players: List[int], trainers: List[int]) -> int:
-        matches = 0
-
-        players.sort(reverse=True)
-        trainers.sort(reverse=True)
-
-        for p in players:
-            if not trainers or p > trainers[0]:
-                continue # player can't be matched
-            matches += 1
-            trainers.pop(0)
-        return matches
+        players.sort()
+        trainers.sort()
+        i = len(players)-1
+        j = len(trainers)-1
+        res = 0
+        while i>=0 and j>=0:
+            if players[i] <= trainers[j]:
+                j -= 1
+                i -= 1
+                res += 1
+            else:
+                i -= 1
+        return res
+            
