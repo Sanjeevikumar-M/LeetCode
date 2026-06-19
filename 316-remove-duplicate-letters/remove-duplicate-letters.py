@@ -5,11 +5,10 @@ class Solution:
         visited = set()
 
         for i,ch in enumerate(s):
-            if ch in st:
-                continue
-            while st and st[-1]>ch and last_occ[st[-1]]>i:
-                removed = st.pop()
-                visited.remove(removed)
-            st.append(ch)
-            visited.add(ch)
+            if ch not in st:
+                while st and st[-1]>ch and last_occ[st[-1]]>i:
+                    removed = st.pop()
+                    visited.remove(removed)
+                st.append(ch)
+                visited.add(ch)
         return "".join(st)
