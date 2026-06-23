@@ -1,65 +1,28 @@
 class Solution {
-    static final long MOD = 1_000_000_007L;
-
     public int zigZagArrays(int n, int l, int r) {
-        int m = r - l + 1;
-
-        long[] up = new long[m];
-        long[] down = new long[m];
-
-        // Length = 2 initialization
-        for (int b = 0; b < m; b++) {
-            up[b] = b;                 // values smaller than b
-            down[b] = m - 1 - b;      // values greater than b
-        }
-
-        if (n == 2) {
-            long ans = 0;
-            for (int i = 0; i < m; i++) {
-                ans = (ans + up[i] + down[i]) % MOD;
+        int MOD = 1_000_000_007;
+        r -= l;
+        int[] dp = new int[r + 1];
+        Arrays.fill(dp, 1);
+        for (int i = 1; i < n; i++) {
+            int pre = 0, pre2;
+            if ((i & 1) == 1) {
+                for (int v = 0; v <= r; v++) {
+                    pre2 = pre + dp[v];
+                    dp[v] = pre;
+                    pre = pre2 % MOD;
+                }
+            } else {
+                for (int v = r; v >= 0; v--) {
+                    pre2 = pre + dp[v];
+                    dp[v] = pre;
+                    pre = pre2 % MOD;
+                }
             }
-            return (int) ans;
         }
-
-        for (int len = 3; len <= n; len++) {
-
-            long[] prefDown = new long[m];
-            long[] prefUp = new long[m];
-
-            prefDown[0] = down[0];
-            prefUp[0] = up[0];
-
-            for (int i = 1; i < m; i++) {
-                prefDown[i] = (prefDown[i - 1] + down[i]) % MOD;
-                prefUp[i] = (prefUp[i - 1] + up[i]) % MOD;
-            }
-
-            long totalUp = prefUp[m - 1];
-
-            long[] newUp = new long[m];
-            long[] newDown = new long[m];
-
-            for (int y = 0; y < m; y++) {
-
-                // sum down[x] where x < y
-                if (y > 0)
-                    newUp[y] = prefDown[y - 1];
-
-                // sum up[x] where x > y
-                long left = prefUp[y];
-                newDown[y] = (totalUp - left + MOD) % MOD;
-            }
-
-            up = newUp;
-            down = newDown;
-        }
-
-        long ans = 0;
-
-        for (int i = 0; i < m; i++) {
-            ans = (ans + up[i] + down[i]) % MOD;
-        }
-
-        return (int) ans;
+        int res = 0;
+        for (int v : dp)
+            res = (res + v) % MOD;
+        return res * 2 % MOD;
     }
 }
