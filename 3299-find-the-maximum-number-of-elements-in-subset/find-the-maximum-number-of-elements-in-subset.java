@@ -1,40 +1,28 @@
-import java.util.HashMap;
-import java.util.Map;
-
-class Solution {
+class Solution 
+{
     public int maximumLength(int[] nums) {
-        Map<Long, Integer> countMap = new HashMap<>();
+        Map<Long, Integer> cnt = new HashMap<>();
         for (int num : nums) {
-            countMap.put((long) num, countMap.getOrDefault((long) num, 0) + 1);
+            cnt.merge((long) num, 1, Integer::sum);
         }
 
-        int maxLength = 0;
+        int oneCnt = cnt.getOrDefault(1L, 0);
+        int ans = (oneCnt & 1) == 1 ? oneCnt : oneCnt - 1;
 
-        if (countMap.containsKey(1L)) {
-            int oneCount = countMap.get(1L);
-            maxLength = (oneCount % 2 == 0) ? oneCount - 1 : oneCount;
-        }
+        cnt.remove(1L);
 
-        for (long x : countMap.keySet()) {
-            if (x == 1) continue;
+        for (long num : cnt.keySet()) {
+            int res = 0;
+            long x = num;
 
-            int currentLength = 0;
-            long current = x;
-
-            while (countMap.containsKey(current) && countMap.get(current) >= 2) {
-                currentLength += 2;
-                current = current * current; 
+            while (cnt.containsKey(x) && cnt.get(x) > 1) {
+                res += 2;
+                x *= x;
             }
 
-            if (countMap.containsKey(current) && countMap.get(current) >= 1) {
-                currentLength += 1;
-            } else {
-                currentLength -= 1; 
-            }
-
-            maxLength = Math.max(maxLength, currentLength);
+            ans = Math.max(ans, res + (cnt.containsKey(x) ? 1 : -1));
         }
 
-        return maxLength;
+        return ans;
     }
 }
