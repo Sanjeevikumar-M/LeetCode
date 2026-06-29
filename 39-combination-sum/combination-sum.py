@@ -1,15 +1,17 @@
 class Solution:
-    def combinationSum(self, candidates: List[int], target: int) -> List[List[int]]:
+    def combinationSum(self, nums: List[int], target: int) -> List[List[int]]:
         res = []
-        def validCombination(index,ctarget,curr_combo):
-            if ctarget == 0:
-                res.append(list(curr_combo))
+        nums.sort()
+        def dfs(i,comb,total):
+            if total == target:
+                res.append(comb.copy())
                 return
-            if ctarget < 0:
-                return
-            for i in range(index,len(candidates)):
-                curr_combo.append(candidates[i])
-                validCombination(i,ctarget - candidates[i],curr_combo)
-                curr_combo.pop()
-        validCombination(0,target,[])
+            
+            for j in range(i,len(nums)):
+                if total + nums[j] > target: return
+                comb.append(nums[j])
+                dfs(j,comb,total+nums[j])
+                comb.pop()
+        dfs(0,[],0)
         return res
+        
