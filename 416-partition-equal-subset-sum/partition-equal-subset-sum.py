@@ -1,13 +1,12 @@
 class Solution:
     def canPartition(self, nums: list[int]) -> bool:
-        tot=sum(nums)
-        if (tot%2)!=0:
+        n = sum(nums)
+        if n%2!=0:
             return False
-
-        target=tot>>1
-        bits=1
-        
+        ss = n//2
+        dp = [False]*(ss+1)
+        dp[0] = True
         for num in nums:
-            bits |= bits<<num
-            
-        return (bits>>target) & 1==1
+            for i in range(ss,num-1,-1):
+                dp[i] = dp[i] or dp[i-num]
+        return dp[ss]
