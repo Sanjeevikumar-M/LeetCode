@@ -12,7 +12,7 @@ class Solution {
                 i++;
                 j++;
                 count++;
-            }else if(g[i] > s[i]){
+            }else if(g[i] > s[j]){
                 j++;
             }
         }
