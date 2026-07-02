@@ -5,12 +5,11 @@ class Solution {
         Arrays.sort(pairs, (a,b) -> Integer.compare(a[1],b[1]));
 
         int count = 0;
-        int currentEnd = Integer.MIN_VALUE;
-
+        int currEnd = Integer.MIN_VALUE;
         for(int[] pair:pairs){
-            if(pair[0]>currentEnd){
+            if(pair[0]>currEnd){
                 count++;
-                currentEnd = pair[1];
+                currEnd=pair[1];
             }
         }
         return count;
