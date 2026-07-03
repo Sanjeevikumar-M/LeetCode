@@ -1,92 +1,73 @@
-import java.util.*;
-
-public class Solution {
+class Solution {
+    private int[] head, next, to, weight;
+    private long k;
+    private int n;
     public int findMaxPathScore(int[][] edges, boolean[] online, long k) {
-        int n = online.length;
-        
-        // Quick check: if start or end is offline, no path is possible
-        if (!online[0] || !online[n - 1]) return -1;
-        
-        // Find the range of edge costs for binary search
-        int low = 0, high = 0;
-        for (int[] edge : edges) {
-            high = Math.max(high, edge[2]);
-        }
-        
-        int ans = -1;
-        
-        // Binary search for the maximum possible minimum edge cost
-        while (low <= high) {
-            int mid = low + (high - low) / 2;
-            
-            if (isValid(n, edges, online, k, mid)) {
-                ans = mid;      // mid is possible, try to find a larger minimum
-                low = mid + 1;
-            } else {
-                high = mid - 1; // mid is too high, look for smaller values
+        this.n = online.length;
+        this.k = k;
+
+        int m = edges.length;
+        this.head = new int[n];
+        this.next = new int[m];
+        this.to = new int[m];
+        this.weight = new int[m];
+        Arrays.fill(head, -1);
+        int left = Integer.MAX_VALUE, right = 0;
+        for(int i = 0; i < m; i++) {
+            int a = edges[i][0], b = edges[i][1], c = edges[i][2];
+            if(online[a] && online[b]) {
+                to[i] = b;
+                next[i] = head[a];
+                weight[i] = c;
+                head[a] = i;
+
+                if(c > right) right = c;
+                if(c < left) left = c;
             }
         }
-        
-        return ans;
+
+        if(!check(0)) return -1;
+
+        while(left < right) {
+            int mid = left + right + 1 >>> 1;
+            if(check(mid)) left = mid;
+            else right = mid - 1;
+        }
+        return left;
     }
-    
-    private boolean isValid(int n, int[][] edges, boolean[] online, long k, int minEdgeCost) {
-        // Build adjacency list and calculate in-degrees for the filtered graph
-        List<List<int[]>> adj = new ArrayList<>();
-        for (int i = 0; i < n; i++) {
-            adj.add(new ArrayList<>());
-        }
-        
-        int[] inDegree = new int[n];
-        for (int[] edge : edges) {
-            int u = edge[0];
-            int v = edge[1];
-            int cost = edge[2];
-            
-            // Only consider edges between online nodes with cost >= minEdgeCost
-            if (online[u] && online[v] && cost >= minEdgeCost) {
-                adj.get(u).add(new int[]{v, cost});
-                inDegree[v]++;
-            }
-        }
-        
-        // DP array to track minimum path cost to each node
-        long[] dp = new long[n];
-        Arrays.fill(dp, Long.MAX_VALUE);
-        dp[0] = 0;
-        
-        // Kahn's algorithm for Topological Sort
-        Queue<Integer> queue = new LinkedList<>();
-        for (int i = 0; i < n; i++) {
-            if (online[i] && inDegree[i] == 0) {
-                queue.offer(i);
-            }
-        }
-        
-        while (!queue.isEmpty()) {
-            int u = queue.poll();
-            
-            if (dp[u] != Long.MAX_VALUE) {
-                for (int[] neighbor : adj.get(u)) {
-                    int v = neighbor[0];
-                    int cost = neighbor[1];
-                    
-                    if (dp[u] + cost < dp[v]) {
-                        dp[v] = dp[u] + cost;
-                    }
-                }
-            }
-            
-            for (int[] neighbor : adj.get(u)) {
-                int v = neighbor[0];
-                inDegree[v]--;
-                if (inDegree[v] == 0) {
-                    queue.offer(v);
+
+    private static final int[] queue = new int[50001];
+    private static final long[] sum = new long[50001];
+    private boolean check(int threshold) {
+        long[] dist = new long[n];
+        Arrays.fill(dist, k + 1);
+        dist[0] = 0;
+
+        int read = 0, write = 1;
+        while(read < write) {
+            int current = queue[read];
+            long val = sum[read++];
+            if(val > dist[current]) continue;
+            for(int i = head[current]; i != -1; i = next[i]) {
+                if(weight[i] < threshold) continue;
+                int nextIndex = to[i];
+                long d = val + weight[i];
+                if(d < dist[nextIndex]) {
+                    if(nextIndex == n - 1) return true;
+                    dist[nextIndex] = d;
+                    sum[write] = d;
+                    queue[write++] = nextIndex;
                 }
             }
         }
-        
-        // If destination is reachable and total cost is within budget k
-        return dp[n - 1] <= k;
+        return false;
+    }
+    private static final class Node {
+        private final int index;
+        private final long dist;
+        private Node(int index, long dist) {
+            this.index = index;
+            this.dist = dist;
+        }
     }
 }
