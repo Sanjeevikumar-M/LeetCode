@@ -1,27 +1,31 @@
 class Solution {
+    static int[][] memo;
+
     public int minDistance(String word1, String word2) {
-        int n = word1.length();
-        int m = word2.length();
-        int[][] dp = new int[n+1][m+1];
+        int m = word1.length();
+        int n = word2.length();
 
-        for(int i=0;i<n+1;i++){
-            dp[i][m] = n-i;
-        }
-        for(int j=0;j<m+1;j++){
-            dp[n][j] = m-j;
+        memo = new int[m][n];
+
+        for(int[] rows:memo){
+            Arrays.fill(rows,-1);
         }
 
-        for(int i=n-1;i>=0;i--){
-            for(int j=m-1;j>=0;j--){
-                if(word1.charAt(i)==word2.charAt(j)){
-                    dp[i][j] = dp[i+1][j+1];
-                }
-                else{
-                    dp[i][j] = 1+Math.min(dp[i+1][j+1],Math.min(dp[i][j+1],dp[i+1][j]));
-                }
-            }
+        return solve(0,0,word1,word2);
+    }
+
+    private static int solve(int i,int j,String word1,String word2){
+        if(i==word1.length()) return word2.length() - j;
+        if(j==word2.length()) return word1.length() - i;
+
+        if(memo[i][j]!=-1){
+            return memo[i][j];
         }
 
-        return dp[0][0];
+        if(word1.charAt(i)==word2.charAt(j)){
+            return memo[i][j] = solve(i+1,j+1,word1,word2);
+        }
+
+        return memo[i][j] = 1 + Math.min(solve(i+1,j,word1,word2),Math.min(solve(i,j+1,word1,word2),solve(i+1,j+1,word1,word2)));
     }
 }
