@@ -7,18 +7,16 @@ class Solution {
             if(nums[i]-nums[i-1] <= maxDiff){
                 comp[i] = comp[i-1];
             }else{
-                comp[i] = comp[i-1]+1;
+                comp[i] = comp[i-1] + 1;
             }
         }
 
         boolean[] answer = new boolean[queries.length];
-        
-        for(int i = 0;i<queries.length;i++){
+        for(int i=0;i<queries.length;i++){
             int u = queries[i][0];
             int v = queries[i][1];
-            answer[i] = (comp[u] == comp[v]);
+            answer[i] = (comp[u]==comp[v]);
         }
-        
         return answer;
     }
 }
