@@ -1,91 +1,44 @@
-import java.util.Arrays;
-
 class Solution {
     public int[] pathExistenceQueries(int n, int[] nums, int maxDiff, int[][] queries) {
-        // Pair up values with their original indices
-        int[][] elements = new int[n][2];
-        for (int i = 0; i < n; i++) {
-            elements[i][0] = nums[i];
-            elements[i][1] = i;
-        }
-        
-        // Sort based on the actual values in nums
-        Arrays.sort(elements, (a, b) -> Integer.compare(a[0], b[0]));
-        
-        // Map original index to sorted position index
-        int[] pos = new int[n];
-        for (int i = 0; i < n; i++) {
-            pos[elements[i][1]] = i;
-        }
-        
-        // Compute the greedy next pointer for each sorted element
-        // nextP[i] stores the index of the furthest element to the right reachable from i
-        int[] nextP = new int[n];
+        int m = queries.length, l = 1;
+        int[] ans = new int[m];
+        long[] sorted = new long[n];
+        for(int i = 0; i < n; i++) sorted[i] = (long)nums[i] << 32 | i;
+        Arrays.sort(sorted);
+
+        for(int i = 1; i < n; i <<= 1) l++;
+        int[][] jumps = new int[l][n];
+
+        int[] rank = new int[n];
         int right = 0;
-        for (int i = 0; i < n; i++) {
-            while (right < n && elements[right][0] - elements[i][0] <= maxDiff) {
-                right++;
-            }
-            nextP[i] = right - 1; 
+        for(int i = 0; i < n; i++) {
+            rank[(int)sorted[i]] = i;
+            while(right < n && (sorted[right] >>> 32) <= (sorted[i] >>> 32) + maxDiff) right++;
+            jumps[0][i] = right - 1;
         }
-        
-        // Build the Binary Lifting Table (Sparse Table)
-        int LOG = 18; // 2^17 = 131,072 > 10^5
-        int[][] up = new int[n][LOG];
-        
-        for (int i = 0; i < n; i++) {
-            up[i][0] = nextP[i];
+        for(int i = 1; i < l; i++) {
+            for(int j = 0; j < n; j++) jumps[i][j] = jumps[i - 1][jumps[i - 1][j]];
         }
-        
-        for (int j = 1; j < LOG; j++) {
-            for (int i = 0; i < n; i++) {
-                up[i][j] = up[up[i][j - 1]][j - 1];
+        for(int i = 0; i < m; i++) {
+            int a = rank[queries[i][0]], b = rank[queries[i][1]];
+            if(a > b) {
+                int temp = a;
+                a = b;
+                b = temp;
             }
+            ans[i] = jumps[l - 1][a] < b ? -1 : calcJumps(jumps, a, b, l);
         }
-        
-        int[] answer = new int[queries.length];
-        
-        for (int q = 0; q < queries.length; q++) {
-            int u = queries[q][0];
-            int v = queries[q][1];
-            
-            if (u == v) {
-                answer[q] = 0;
-                continue;
-            }
-            
-            int pU = pos[u];
-            int pV = pos[v];
-            
-            // Ensure pU is the smaller value to lift towards pV
-            if (pU > pV) {
-                int temp = pU;
-                pU = pV;
-                pV = temp;
-            }
-            
-            // If the maximum reach of pU cannot even cross or equal pV, they are disconnected
-            if (up[pU][LOG - 1] < pV) {
-                answer[q] = -1;
-                continue;
-            }
-            
-            // Binary lift to count the minimum required steps
-            int steps = 0;
-            int curr = pU;
-            
-            for (int j = LOG - 1; j >= 0; j--) {
-                if (up[curr][j] < pV) {
-                    curr = up[curr][j];
-                    steps += (1 << j);
-                }
-            }
-            
-            // One final jump from the lower bound to cover or overshoot pV safely
-            steps += 1;
-            answer[q] = steps;
+        return ans;
+    }
+    private int calcJumps(int[][] jumps, int a, int b, int right) {
+        if(a == b) return 0;
+        if(jumps[0][a] >= b) return 1;
+        int left = 0;
+        while(left < right) {
+            int mid = left + right + 1 >>> 1;
+            if(jumps[mid][a] < b) left = mid;
+            else right = mid - 1;
         }
-        
-        return answer;
+        return (1 << left) + calcJumps(jumps, jumps[left][a], b, left);
     }
 }
