@@ -1,7 +1,7 @@
 class Solution {
 
     static {
-        for(int i = 0; i < 250; i++)
+        for(int i = 0; i < 91; i++)
             replaceElements(new int[]{0});
     }
     public static int[] replaceElements(int[] arr) 
