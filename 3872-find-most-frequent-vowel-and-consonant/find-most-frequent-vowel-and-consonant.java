@@ -1,24 +1,17 @@
 class Solution {
     public int maxFreqSum(String s) {
-        HashMap<Character,Integer> map = new HashMap<>();
-        for(char i:s.toCharArray()){
-            map.put(i,map.getOrDefault(i,0)+1);
+        int[] fq = new int[26];
+        for(char c:s.toCharArray()){
+            fq[c-'a']++;
         }
-        int vmax = 0;
-        int cmax = 0;
-        for(Map.Entry<Character, Integer> entry : map.entrySet()){
-            char ch = entry.getKey();
-            int freq = entry.getValue();
-            if(isVowel(ch)){
-                vmax = Math.max(vmax,freq);
-            }else{
-                cmax = Math.max(cmax,freq);
+        int maxv = 0, maxc = 0;
+        for(int i=0; i<26; i++){
+            int f = fq[i];
+            if((i==0 || i==4 || i==8 || i==14 || i==20)){
+                if(maxv<f) maxv = f;
             }
+            else if(maxc < f) maxc = f;
         }
-        return vmax+cmax;
-    }
-
-    private boolean isVowel(char c){
-        return c=='a' || c=='e' || c=='i' || c=='o' || c=='u';
+        return maxv + maxc;
     }
 }
