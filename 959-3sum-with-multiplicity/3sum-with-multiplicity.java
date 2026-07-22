@@ -1,5 +1,6 @@
 class Solution {
     public int threeSumMulti(int[] arr, int target) {
+        System.gc();
         long[] count = new long[101];
         for (int x : arr) {
             count[x]++;
