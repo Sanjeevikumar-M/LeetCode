@@ -6,11 +6,11 @@ class Solution {
         int rightMax = 0;
         int result = 0;
         while(left<right){
-            if(height[left]<=height[right]){
+            if(height[left]<height[right]){
                 if(height[left]>leftMax){
                     leftMax = height[left];
                 }else{
-                    result += leftMax - height[left];
+                    result += leftMax-height[left];
                 }
                 left++;
             }else{
