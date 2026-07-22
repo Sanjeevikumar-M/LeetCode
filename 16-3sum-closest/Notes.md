@@ -1,1 +1,1 @@
-<h2>3sum-closest Notes</h2><hr>[ Time taken: 17m 19s ]
+<h2>3sum-closest Notes</h2><hr>[ Time taken: 5m 27s ]
