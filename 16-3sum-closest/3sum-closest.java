@@ -1,5 +1,6 @@
 class Solution {
     public int threeSumClosest(int[] nums, int target) {
+        System.gc();
         Arrays.sort(nums);
         int n = nums.length;
         int closestSum = nums[0] + nums[1] + nums[2];
