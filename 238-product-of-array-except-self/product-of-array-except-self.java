@@ -7,8 +7,8 @@ class Solution {
         }
         int right = 1;
         for(int i=nums.length-1;i>=0;i--){
-            result[i] = result[i]*right;
-            right *= nums[i];
+            result[i]*=right;
+            right*=nums[i];
         }
         return result;
     }
