@@ -1,73 +1,66 @@
 class Solution {
     public String smallestPalindrome(String s, int k) {
         int[] freq = new int[26];
-        for (char c : s.toCharArray()) {
-            freq[c - 'a']++;
+        int n = s.length();
+        int cnt = 0;
+        long totalWays = 1L;
+        for(int i=0;i<n/2;i++){
+            freq[s.charAt(i)-'a']++;
         }
-        
-        int[] half = new int[26];
-        StringBuilder mid = new StringBuilder();
-        int m = 0;
-        
-        for (int i = 0; i < 26; ++i) {
-            if (freq[i] % 2 != 0) {
-                mid.append((char) (i + 'a'));
-            }
-            half[i] = freq[i] / 2;
-            m += half[i];
-        }
-        
-        if (getWays(half, k) < k) {
-            return "";
-        }
-        
-        StringBuilder firstHalf = new StringBuilder();
-        for (int i = 0; i < m; ++i) {
-            for (int c = 0; c < 26; ++c) {
-                if (half[c] > 0) {
-                    half[c]--;
-                    long ways = getWays(half, k);
-                    
-                    if (ways >= k) {
-                        firstHalf.append((char) (c + 'a'));
-                        break;
-                    } else {
-                        k -= ways;
-                        half[c]++;
+
+        char[] alpha = {
+            'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
+            'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'
+        };
+        StringBuilder sb = new StringBuilder();
+        outer : for(int i=25;i>=0;i--){
+            if(freq[i]==0)continue;
+            int j=1;
+            while(j<=freq[i]){
+                cnt++;
+                totalWays = (totalWays*cnt)/j;
+                if(totalWays>k){
+                    for(int l = 0;l<i;l++){
+                        while(freq[l]>0){
+                            sb.append(alpha[l]);
+                            freq[l]--;
+                        }
                     }
+                    while(freq[i]>j){
+                        sb.append(alpha[i]);
+                        freq[i]--;
+                    }
+                    break outer;
+                }
+                j++;
+            }
+        }
+        if(k>totalWays)return "";
+        
+        
+        for(int i=0;i<cnt;i++){
+            for(char ch= 'a';ch<='z';ch++){
+                int j = ch-'a';
+                if(freq[j]==0)continue;
+                if(k<=(totalWays*freq[j])/(cnt-i)){
+                   totalWays = (totalWays*freq[j])/(cnt-i);
+                   freq[j]--;
+                   sb.append(ch);
+                   break;
+                }
+                else{
+                    k = (int)(k - (totalWays*freq[j])/(cnt-i));
                 }
             }
         }
-        
-        StringBuilder res = new StringBuilder(firstHalf);
-        res.append(mid);
-        res.append(firstHalf.reverse());
-        return res.toString();
-    }
-    
-    private long getWays(int[] f, long targetK) {
-        long ways = 1;
-        int currLen = 0;
-        for (int count : f) {
-            if (count > 0) {
-                currLen += count;
-                long n = currLen;
-                long r = count;
-                
-                if (r > n - r) r = n - r;
-                long curNCr = 1;
-                
-                for (int i = 1; i <= r; ++i) {
-                    curNCr = curNCr * (n - i + 1) / i;
-                    if (curNCr > targetK) {
-                        curNCr = targetK + 1;
-                        break;
-                    }
-                }
-                ways *= curNCr;
-                if (ways > targetK) return targetK + 1;
-            }
+        if(n%2==1){
+            sb.append(s.charAt(n/2));
         }
-        return ways;
+
+        for(int i=n/2-1;i>=0;i--){
+            sb.append(sb.charAt(i));
+        }
+
+        return sb.toString();
     }
 }
