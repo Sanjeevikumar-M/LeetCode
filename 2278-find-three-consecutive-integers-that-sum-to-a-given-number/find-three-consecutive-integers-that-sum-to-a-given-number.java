@@ -1,8 +1,7 @@
 class Solution {
     public long[] sumOfThree(long num) {
-        long n = num/3;
-        if((n-1+n+n+1) == num){
-            return new long[]{n-1,n,n+1};
+        if(num%3==0){
+            return new long[]{num/3-1,num/3,num/3+1};
         }else{
             return new long[]{};
         }
