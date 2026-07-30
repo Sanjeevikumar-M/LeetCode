@@ -4,10 +4,10 @@ class Solution {
         int i=nums.length-1;
         for(;i>=0;i--){
             if(freq[nums[i]]){
-                break;
+                return i/3+1;
             }
             freq[nums[i]] = true;;
         }
-        return (i+3)/3;
+        return 0;
     }
 }
