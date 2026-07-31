@@ -13,15 +13,13 @@ class Solution {
             int freqB = map.get(b);
 
             if(freqA!=freqB){
-                return freqB-freqA;
+                return freqA-freqB;
             }
-            return a-b;
+            return b-a;
         });
 
-        int m = 0;
-        for(int i=list.size()-1;i>=0;i--){
-            nums[m] = list.get(i);
-            m++;
+        for(int i=0;i<list.size();i++){
+            nums[i] = list.get(i);
         }
 
         return nums;
