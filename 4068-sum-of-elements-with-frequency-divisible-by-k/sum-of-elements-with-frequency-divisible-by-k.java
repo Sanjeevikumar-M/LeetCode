@@ -1,15 +1,15 @@
 class Solution {
     public int sumDivisibleByK(int[] nums, int k) {
-        HashMap<Integer,Integer> map = new HashMap<>();
-        for(int i:nums){
-            map.put(i,map.getOrDefault(i,0)+1);
+        int ar[] = new int[101];
+        for(int val:nums) {
+            ar[val]++;
         }
-        int sum = 0;
-        for(int i:map.keySet()){
-            if(map.get(i)%k == 0){
-                sum += (i*map.get(i));
+        int res=0;
+        for(int i=1;i<ar.length;i++) {
+            if(ar[i]!=0 && ar[i]%k==0) {
+                res = res + ar[i]*i;
             }
         }
-        return sum;
-    } 
+        return res;
+    }
 }
