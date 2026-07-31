@@ -1,22 +1,48 @@
 class Solution {
     public int minimumPushes(String word) {
-        int[] count = new int[26];
-        for(char i:word.toCharArray()){
-            count[i-'a']++;
+        int freq[] = new int[26];
+        for (int i = 0; i < word.length(); i++) {
+            freq[word.charAt(i) - 'a']++;
         }
-        Arrays.sort(count);
-        int pushes = 0;
-        for(int i=25;i>=0;i--){
-            if(i>17){
-                pushes+= count[i];
-            }else if(i>9){
-                pushes+= (count[i]*2);
-            }else if(i>1){
-                pushes += (count[i]*3);
-            }else{
-                pushes += (count[i]*4);
+        countSort(freq);
+        int j = 25;
+        int cnt = 0;
+        int ans = 0;
+        while (j >= 0) {
+            int t = freq[j];
+            if (t > 0)
+                cnt++;
+            if (cnt <= 8) {
+                ans += t;
+            } else if (cnt > 8 && cnt <= 16) {
+                ans += t * 2;
+            } else if (cnt > 16 && cnt <= 24) {
+                ans += t * 3;
+
+            } else if (cnt > 24 && cnt <= 26) {
+                ans += t * 4;
+            }
+            j--;
+        }
+        return ans;
+    }
+
+    public void countSort(int[] nums) {
+        int max = 0;
+        for (int i = 0; i < 26; i++) {
+            max = Math.max(nums[i], max);
+        }
+        int freq[] = new int[max + 1];
+        for (int i = 0; i < 26; i++) {
+            freq[nums[i]]++;
+        }
+        int j = 0;
+        for (int i = 0; i < max + 1; i++) {
+            while (freq[i] > 0) {
+                nums[j] = i;
+                freq[i]--;
+                j++;
             }
         }
-        return pushes;
     }
 }
