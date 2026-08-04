@@ -9,6 +9,6 @@ class Solution {
                 return false;
             }
         }
-        return count==3 ? true : false;
+        return count==3;
     }
 }
