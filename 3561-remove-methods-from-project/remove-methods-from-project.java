@@ -1,52 +1,57 @@
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
+
 class Solution {
-    public void func(int u, List<List<Integer>> adj, boolean[] vis) {
-        vis[u] = true;
-
-        for (int v : adj.get(u)) {
-            if (vis[v]) continue;
-            func(v, adj, vis);
-        }
-    }
-
     public List<Integer> remainingMethods(int n, int k, int[][] invocations) {
-        List<List<Integer>> adj = new ArrayList<>();
-
+        List<Integer>[] adj = new ArrayList[n];
         for (int i = 0; i < n; i++) {
-            adj.add(new ArrayList<>());
+            adj[i] = new ArrayList<>();
         }
-
-        for (int[] it : invocations) {
-            int u = it[0];
-            int v = it[1];
-            adj.get(u).add(v);
+        
+        for (int[] e : invocations) {
+            adj[e[0]].add(e[1]);
         }
+        
+        boolean[] suspicious = new boolean[n];
 
-        boolean[] vis = new boolean[n];
-        func(k, adj, vis);
-
-        for (int[] it : invocations) {
-            int u = it[0];
-            int v = it[1];
-
-            if (vis[u]) continue;
-
-            if (vis[v]) {
-                List<Integer> ans = new ArrayList<>();
-                for (int i = 0; i < n; i++) {
-                    ans.add(i);
+        Queue<Integer> q = new LinkedList<>();
+        q.offer(k);
+        suspicious[k] = true;
+        
+        while (!q.isEmpty()) {
+            int u = q.poll();
+            
+            for (int v : adj[u]) {
+                if (!suspicious[v]) {
+                    suspicious[v] = true;
+                    q.offer(v);
                 }
-                return ans;
             }
         }
-
-        List<Integer> ans = new ArrayList<>();
-
+        
         for (int i = 0; i < n; i++) {
-            if (!vis[i]) {
+            if (!suspicious[i]) {
+                for (int v : adj[i]) {
+                    if (suspicious[v]) {
+                        List<Integer> ans = new ArrayList<>();
+                        for (int j = 0; j < n; j++) {
+                            ans.add(j);
+                        }
+                        return ans;
+                    }
+                }
+            }
+        }
+        
+        List<Integer> ans = new ArrayList<>();
+        for (int i = 0; i < n; i++) {
+            if (!suspicious[i]) {
                 ans.add(i);
             }
         }
-
+        
         return ans;
     }
 }
