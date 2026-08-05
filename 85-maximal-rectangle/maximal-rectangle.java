@@ -1,55 +1,36 @@
 class Solution {
     public int maximalRectangle(char[][] matrix) {
-        if (matrix == null || matrix.length == 0 || matrix[0].length == 0)
-            return 0;
+        int m = matrix.length, n = matrix[0].length, ans = 0;
+        int[]hist = new int[n];
 
-        int M = matrix.length;
-        int N = matrix[0].length;
-
-        int[][] mat = new int[M][N];
-
-        // convert char to int
-        for (int i = 0; i < M; i++) {
-            for (int j = 0; j < N; j++) {
-                mat[i][j] = matrix[i][j] - '0';
+        for(int i=0;i<m;i++){
+            for(int j=0;j<n;j++){
+                if(matrix[i][j]!='0')hist[j]+=1;
+                else hist[j] = 0;
             }
+            int area = area(hist);
+            ans = Math.max(ans, area);
         }
 
-        // row-wise prefix widths
-        for (int i = 0; i < M; i++) {
-            for (int j = 1; j < N; j++) {
-                if (mat[i][j] == 1) {
-                    mat[i][j] += mat[i][j - 1];
-                }
+        return ans;
+       
+    }
+
+    public static int area(int[] heights) {
+        int n = heights.length;
+        int maxArea = 0;
+        Stack<Integer> stack = new Stack<>();
+
+        for (int i = 0; i <= n; i++) {
+            int h = (i == n) ? 0 : heights[i];
+            while (!stack.isEmpty() && h < heights[stack.peek()]) {
+                int height = heights[stack.pop()];
+                int width = stack.isEmpty() ? i : i - stack.peek() - 1;
+                maxArea = Math.max(maxArea, height * width);
             }
+            stack.push(i);
         }
 
-        int Ans = 0;
-
-        // fix each column
-        for (int j = 0; j < N; j++) {
-            for (int i = 0; i < M; i++) {
-                int width = mat[i][j];
-                if (width == 0) continue;
-
-                // expand downward
-                int currWidth = width;
-                for (int k = i; k < M && mat[k][j] > 0; k++) {
-                    currWidth = Math.min(currWidth, mat[k][j]);
-                    int height = k - i + 1;
-                    Ans = Math.max(Ans, currWidth * height);
-                }
-
-                // expand upward
-                currWidth = width;
-                for (int k = i; k >= 0 && mat[k][j] > 0; k--) {
-                    currWidth = Math.min(currWidth, mat[k][j]);
-                    int height = i - k + 1;
-                    Ans = Math.max(Ans, currWidth * height);
-                }
-            }
-        }
-
-        return Ans;
+        return maxArea;
     }
 }
