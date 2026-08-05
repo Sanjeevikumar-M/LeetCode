@@ -1,6 +1,6 @@
 class Solution {
     public boolean checkIfPangram(String sentence) {
-        String target = "qwertyuiopasdfghjklzxcvbnm";
+        String target = "abcdefghijklmnopqrstuvwxyz";
         for(char ch:target.toCharArray()){
             if(sentence.indexOf(ch) == -1){
                 return false;
