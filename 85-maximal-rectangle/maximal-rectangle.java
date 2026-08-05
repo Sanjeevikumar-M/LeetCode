@@ -1,36 +1,44 @@
 class Solution {
     public int maximalRectangle(char[][] matrix) {
-        int m = matrix.length, n = matrix[0].length, ans = 0;
-        int[]hist = new int[n];
+        if(matrix.length == 0) return 0;
 
-        for(int i=0;i<m;i++){
-            for(int j=0;j<n;j++){
-                if(matrix[i][j]!='0')hist[j]+=1;
-                else hist[j] = 0;
+        int row = matrix.length;
+        int cols = matrix[0].length;
+        int[] heights = new int[cols];
+        int max = 0;
+
+        for(int i=0; i<row; i++){
+            for(int j=0; j<cols; j++){
+                if(matrix[i][j] == '1'){
+                    heights[j] += 1;
+                }
+                else{
+                    heights[j] = 0;
+                }
             }
-            int area = area(hist);
-            ans = Math.max(ans, area);
+            max = Math.max(max, largestRectangle(heights));
         }
 
-        return ans;
-       
+        return max;
     }
 
-    public static int area(int[] heights) {
-        int n = heights.length;
-        int maxArea = 0;
-        Stack<Integer> stack = new Stack<>();
+    public static int largestRectangle(int[] heights){
+        Deque<Integer> stack = new ArrayDeque<>();
+        int rect = 0;
 
-        for (int i = 0; i <= n; i++) {
-            int h = (i == n) ? 0 : heights[i];
-            while (!stack.isEmpty() && h < heights[stack.peek()]) {
+        for(int i=0; i<=heights.length; i++){
+            int current = (i == heights.length) ? 0 : heights[i];
+
+            while(!stack.isEmpty() && heights[stack.peek()] > current){
                 int height = heights[stack.pop()];
-                int width = stack.isEmpty() ? i : i - stack.peek() - 1;
-                maxArea = Math.max(maxArea, height * width);
+                int width = (stack.isEmpty()) ? i : i - stack.peek() -1;
+
+                rect = Math.max(rect, height*width);
             }
+
             stack.push(i);
         }
 
-        return maxArea;
+        return rect;
     }
 }
