@@ -1,21 +1,22 @@
 class Solution {
     public int maxSubarrayLength(int[] nums, int k) {
-        // Intuition: only nums[right] itself can break the window, shrink from left until it fits again
+        // Intuition: window size never shrinks, only slides; track how many values exceed k
         int n = nums.length;
-        int r = 1;
         int left = 0;
+        int bad = 0;
         HashMap<Integer, Integer> freq = new HashMap<>();
         for (int right = 0; right < n; right++) {
             int c = nums[right];
-            freq.put(c, freq.getOrDefault(c, 0) + 1);
-            // Decrease window length until k constraint is true again
-            while (freq.get(c) > k) {
-                int d = nums[left];
-                freq.put(d, freq.get(d) - 1);
-                left++;
-            }
-            r = Math.max(r, right - left + 1);
+            int cnt = freq.getOrDefault(c, 0) + 1;
+            freq.put(c, cnt);
+            if (cnt == k + 1) bad++;
+            if (bad == 0) continue;
+            int d = nums[left];
+            int dc = freq.get(d) - 1;
+            freq.put(d, dc);
+            if (dc == k) bad--;
+            left++;
         }
-        return r;
+        return n - left;
     }
 }
