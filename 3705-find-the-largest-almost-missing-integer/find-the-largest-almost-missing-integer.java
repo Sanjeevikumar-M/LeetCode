@@ -1,31 +1,33 @@
 class Solution {
+
     public int largestInteger(int[] nums, int k) {
-        int[] subarrayCount = new int[51];
         int n = nums.length;
-
-        // Iterate over every valid starting index of a subarray of size k
-        for (int i = 0; i <= n - k; i++) {
-            boolean[] seenInSubarray = new boolean[51];
-            for (int j = i; j < i + k; j++) {
-                seenInSubarray[nums[j]] = true;
+        if (n == k) {
+            int res = nums[0];
+            for (int x : nums) {
+                res = Math.max(res, x);
             }
-
-            // Increment the subarray count for distinct numbers present in this subarray
-            for (int v = 0; v < 51; v++) {
-                if (seenInSubarray[v]) {
-                    subarrayCount[v]++;
+            return res;
+        }
+        int[] count = new int[51];
+        for (int x : nums) {
+            count[x]++;
+        }
+        if (k == 1) {
+            for (int i = 50; i >= 0; --i) {
+                if (count[i] == 1) {
+                    return i;
                 }
             }
+            return -1;
         }
-
-        // Find the largest integer appearing in exactly one subarray
-        int max = -1;
-        for (int i = 0; i < 51; i++) {
-            if (subarrayCount[i] == 1) {
-                max = Math.max(max, i);
-            }
+        int res = -1;
+        if (count[nums[0]] == 1) {
+            res = Math.max(res, nums[0]);
         }
-
-        return max;
+        if (count[nums[n - 1]] == 1) {
+            res = Math.max(res, nums[n - 1]);
+        }
+        return res;
     }
 }
