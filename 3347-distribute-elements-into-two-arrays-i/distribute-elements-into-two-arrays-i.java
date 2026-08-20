@@ -1,29 +1,36 @@
 class Solution {
-    public int[] resultArray(int[] nums) {
-        List<Integer> arr1 = new ArrayList<>();
-        List<Integer> arr2 = new ArrayList<>();
-        arr1.add(nums[0]);
-        arr2.add(nums[1]);
-        for(int i=2;i<nums.length;i++){
-            if(arr1.get(arr1.size()-1)>arr2.get(arr2.size()-1)){
-                arr1.add(nums[i]);
-            }
-            else if(arr1.get(arr1.size()-1)<arr2.get(arr2.size()-1)){
-                arr2.add(nums[i]);
-            }
+    static {
+        for(int i = 0; i <= 500; i++) {
+            resultArray(new int[2]);
         }
-        int[] res = new int[nums.length];
-        int i = 0;
-        while(i<arr1.size()){
-            res[i] = arr1.get(i);
-            i++;
-        }
-        int j = 0;
-        while(j<arr2.size()){
-            res[i] = arr2.get(j);
-            j++;
-            i++;
-        }
-        return res;
     }
+    public static int[] resultArray(int[] nums) {
+        int n = nums.length;
+        int[] arr1 = new int[n];
+        int[] arr2 = new int[n-1];
+        arr1[0] = nums[0];
+        arr2[0] = nums[1];
+        // Like a stack pointer
+        int arr1Pointer = 0;
+        int arr2Pointer = 0;
+        for(int i = 2; i < n; i++) {
+            if(arr1[arr1Pointer] > arr2[arr2Pointer]) {
+                arr1[++arr1Pointer] = nums[i];
+            } else {
+                arr2[++arr2Pointer] = nums[i];
+            }
+        }
+        for(int i = 0; i <= arr2Pointer; i++) {
+            arr1[++arr1Pointer] = arr2[i];
+        }
+        return arr1;
+    }
+
+    // Idea 1: Instead of using arr1 and arr2, we can directly create a result array and address arr1 via indexes 0 to n/2 and arr2 via n/2 to n-1
+
+    // BUT: Will this work? Because we don't know the resulting length of each array.
+
+    // Idea 2: BUT what actually works is, that we don't need a result array. We can just move elements from arr2 to arr1 to save memory
+
+    // Idea 3: Potentially save more memory by using a single result array of size n. Then reverse the arr2 part. This way we can go from O(2n) -> O(n) space
 }
