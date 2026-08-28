@@ -1,19 +1,13 @@
 class Solution {
     public int countPrimes(int n) {
-        boolean[] prime = new boolean[n];
-        int cnt=0;
-        for (int i = 2; i < n; i++) {
-            prime[i] = true;
+        boolean[] seen = new boolean[n];
+        int ans = 0;
+        for (int num = 2; num < n; num++) {
+            if (seen[num]) continue;
+            ans += 1;
+            for (long mult = (long)num * num; mult < n; mult += num)
+                seen[(int)mult] = true;
         }
-
-        for (int i = 2;i < n; i++) {
-            if (prime[i]) {
-                cnt++;
-                for (int j = i * 2; j < n; j += i) {
-                    prime[j] = false;
-                }
-            }
-        }
-        return cnt;
+        return ans;
     }
 }
