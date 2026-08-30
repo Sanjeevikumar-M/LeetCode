@@ -1,11 +1,5 @@
 class Solution {
     public int twoEggDrop(int n) {
-        int count = 0;
-        int i = 0;
-        while(count<n){
-            count += i;
-            i++;
-        }
-        return i-1;
+        return (int) Math.ceil((-1.0 + Math.sqrt(1 + 8 * n))/2.0);        
     }
 }
