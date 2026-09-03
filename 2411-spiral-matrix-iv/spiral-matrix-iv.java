@@ -10,7 +10,12 @@
  */
 class Solution {
     public int[][] spiralMatrix(int m, int n, ListNode head) {
-        int[][] res = new int[m][n];
+        int[][] res = new int[m][];
+
+        for(int i=0;i<m;i++){
+            res[i] = new int[n];
+            Arrays.fill(res[i],-1);
+        }
 
         int top = 0;
         int bottom = m-1;
@@ -20,47 +25,27 @@ class Solution {
         ListNode temp = head;
 
         while(top<=bottom && left<=right){
-            for(int row=left;row<=right;row++){
-                if(temp!=null){
-                    res[top][row] = temp.val;
-                    temp = temp.next;
-                }else{
-                    res[top][row] = -1;
-                }
+            for(int row=left;row<=right && temp!=null;row++){
+                res[top][row] = temp.val;
+                temp = temp.next;
             }
             top++;
 
-            for(int col=top;col<=bottom;col++){
-                if(temp!=null){
-                    res[col][right] = temp.val;
-                    temp = temp.next;
-                }else{
-                    res[col][right] = -1;
-                }
+            for(int col=top;col<=bottom && temp!=null;col++){
+                res[col][right] = temp.val;
+                temp = temp.next;
             }
             right--;
 
-            if(top<=bottom){
-                for(int row=right;row>=left;row--){
-                    if(temp!=null){
-                        res[bottom][row] = temp.val;
-                        temp = temp.next;
-                    }else{
-                        res[bottom][row] = -1;
-                    }
-                }
+            for(int row=right;row>=left && temp!=null;row--){
+                res[bottom][row] = temp.val;
+                temp = temp.next;
             }
             bottom--;
 
-            if(left<=right){
-                for(int col=bottom;col>=top;col--){
-                    if(temp!=null){
-                        res[col][left] = temp.val;
-                        temp = temp.next;
-                    }else{
-                        res[col][left] = -1;
-                    }
-                }
+            for(int col=bottom;col>=top && temp!=null;col--){
+                res[col][left] = temp.val;
+                temp = temp.next;
             }
             left++;
         }
