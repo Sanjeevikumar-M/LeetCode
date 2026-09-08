@@ -8,8 +8,8 @@ class Solution {
             count[person[0]]--;
             count[person[1]]++;
         }
-        for(int i=0;i<count.length;i++){
-            if(count[i]==n-1) return i;
+        for(int person=0;person<count.length;person++){
+            if(count[person]==n-1) return person;
         }
         return -1;
     }
