@@ -1,16 +1,25 @@
 class Solution {
     public String decodeMessage(String key, String message) {
-        Map<Character, Character> m = new HashMap<>();
-        m.put(' ', ' ');
-        char to = 'a';
-        for(char from : key.toCharArray())
-            if(!m.containsKey(from))
-                m.put(from, to++);
-        System.out.println(m);
-        char[] result = new char[message.length()];
-        for (int j = 0; j < message.length(); j++) {
-            result[j] = m.get(message.charAt(j));
+        char[] map = new char[26];
+        int index = 0;
+
+        for (char c : key.toCharArray()) {
+            if (c != ' ' && map[c - 'a'] == 0) {
+                map[c - 'a'] = (char) ('a' + index);
+                index++;
+            }
         }
-        return new String(result);
+
+        StringBuilder ans = new StringBuilder();
+
+        for (char c : message.toCharArray()) {
+            if (c == ' ') {
+                ans.append(' ');
+            } else {
+                ans.append(map[c - 'a']);
+            }
+        }
+
+        return ans.toString();
     }
 }
