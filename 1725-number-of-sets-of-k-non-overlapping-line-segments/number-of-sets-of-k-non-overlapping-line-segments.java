@@ -1,35 +1,24 @@
 class Solution {
-    private static final long MOD = 1_000_000_007L;
 
-    private long modPow(long base, long exp){
+    private static final long MOD = 1000000007L;
+
+    private long quickPow(long a, long e) {
         long result = 1;
-
-        while(exp>0){
-            if((exp&1L)!=0){
-                result = result*base%MOD;
-            }
-
-            base = base*base%MOD;
-
-            exp >>= 1;
+        while (e > 0) {
+            if ((e & 1) != 0) result = (result * a) % MOD;
+            a = (a * a) % MOD;
+            e >>= 1;
         }
         return result;
     }
+
     public int numberOfSets(int n, int k) {
-        long N = n+k-1L;
-        long R = 2L*k;
-
-        R = Math.min(R,N-R);
-
-        long numerator = 1;
-        long denominator = 1;
-
-        for(long i=1;i<=R;i++){
-            numerator = numerator*(N-R+i)%MOD;
-            denominator = denominator*i%MOD;
+        int m = 2 * k;
+        long numerator = 1, denominator = 1;
+        for (int i = 1; i <= m; i++) {
+            numerator = (numerator * (n + k - i)) % MOD;
+            denominator = (denominator * i) % MOD;
         }
-
-        long inverseDenominator = modPow(denominator, MOD-2);
-        return (int) (numerator*inverseDenominator%MOD);
+        return (int) ((numerator * quickPow(denominator, MOD - 2)) % MOD);
     }
 }
