@@ -1,5 +1,8 @@
 class Solution {
     public int compress(char[] chars) {
+        if (chars.length == 1) {
+            return 1;
+        }
         int left = 0;
         int n = chars.length;
         for(int right=0;right<n;){
