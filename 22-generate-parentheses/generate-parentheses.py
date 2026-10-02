@@ -1,17 +1,16 @@
 class Solution:
     def generateParenthesis(self, n: int) -> list[str]:
-        if n==1: return ["()"]
-
-        n-=1
-        res = []
-
-        def dfs(O,C,s):
-            if not O and not C:
-                res.append(s+')')
-                return
-            if O>0:
-                dfs(O-1,C,s+"(")
-            if C>=O:
-                dfs(O,C-1,s+")")
-        dfs(n,n,"(")
-        return res
+        def FindVal(l: int, r: int, P: str):
+            if l == n:
+                if r == n:
+                    vals.append(P)
+                else:
+                    FindVal(l, r + 1, P + ')')
+            elif l == r:
+                FindVal(l + 1, r, P + '(')
+            else:
+                FindVal(l + 1, r, P + '(')
+                FindVal(l, r + 1, P + ')')
+        vals = []
+        FindVal(0,0,"")
+        return vals
