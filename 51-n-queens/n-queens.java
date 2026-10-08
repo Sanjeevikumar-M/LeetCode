@@ -1,44 +1,55 @@
 class Solution {
-    List<List<String>> res = new ArrayList<>();
     public List<List<String>> solveNQueens(int n) {
+        List<List<String>> result = new ArrayList<>();
         char[][] board = new char[n][n];
-        for(int i=0;i<n;i++){
-            Arrays.fill(board[i],'.');
+        // Fill board with '.'
+        for (int i = 0; i < n; i++) {
+            Arrays.fill(board[i], '.');
         }
-        generate(board,0);
-        return res;
+        backtrack(0, n, board, result);
+        return result;
     }
 
-    public void generate(char[][] board, int row){
-        if(row == board.length){
-            List<String> list = new ArrayList<>();
-            for(int i=0;i<board.length;i++){
-                list.add(new String(board[i]));
+    private void backtrack(int row, int n, char[][] board,List<List<String>> result) {
+        // All queens placed
+        if (row == n) {
+            List<String> solution = new ArrayList<>();
+            for (int i = 0; i < n; i++) {
+                solution.add(new String(board[i]));
             }
-            res.add(list);
+            result.add(solution);
             return;
         }
-        for(int col = 0; col<board[row].length;col++){
-            if(isSafe(board,row,col)){
+        // Try placing queen in every column
+        for (int col = 0; col < n; col++) {
+            if (isSafe(row, col, n, board)) {
                 board[row][col] = 'Q';
-                generate(board,row+1);
+                // Move to next row
+                backtrack(row + 1, n, board, result);
+                // Backtrack
                 board[row][col] = '.';
             }
         }
     }
 
-    public boolean isSafe(char[][] board, int row, int col){
-        for(int i=0;i<row;i++){
-            if(board[i][col]=='Q') return false;
+    private boolean isSafe(int row, int col, int n, char[][] board) {
+        // Check column
+        for (int i = 0; i < row; i++) {
+            if (board[i][col] == 'Q') {
+                return false;
+            }
         }
-
-        int leftMax = Math.min(row,col);
-        for(int i=1;i<=leftMax;i++){
-            if(board[row-i][col-i]=='Q') return false;
+        // Check upper-left diagonal
+        for (int i = row - 1, j = col - 1; i >= 0 && j >= 0; i--, j--) {
+            if (board[i][j] == 'Q') {
+                return false;
+            }
         }
-        int rightMax = Math.min(row,board.length-1-col);
-        for(int i=1;i<=rightMax;i++){
-            if(board[row-i][col+i]=='Q') return false;
+        // Check upper-right diagonal
+        for (int i = row - 1, j = col + 1; i >= 0 && j < n; i--, j++) {
+            if (board[i][j] == 'Q') {
+                return false;
+            }
         }
         return true;
     }
