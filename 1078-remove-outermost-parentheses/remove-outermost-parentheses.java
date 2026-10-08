@@ -1,6 +1,6 @@
 class Solution {
     static {
-        for (int i = 0; i<300; i++) {
+        for (int i = 0; i<60; i++) {
             removeOuterParentheses("()");
         }
     }
