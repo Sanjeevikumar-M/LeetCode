@@ -5,8 +5,9 @@ class Solution {
         generate(list,nums,0);
         return res;
     }
+
     private void generate(List<Integer> list, int[] nums, int index){
-        if(index == nums.length){
+        if(index==nums.length){
             res.add(new ArrayList<>(list));
             return;
         }
