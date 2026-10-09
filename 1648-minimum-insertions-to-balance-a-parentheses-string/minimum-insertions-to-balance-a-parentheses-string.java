@@ -4,14 +4,13 @@ class Solution {
         int openNeeded = 0;
         int n = s.length();
         int i = 0;
-        char[] ch = s.toCharArray();
 
         while(i<n){
-            if(ch[i] == '('){
+            if(s.charAt(i) == '('){
                 openCount++;
                 i++;
             }else{
-                if(i+1<n && ch[i+1] == ')'){
+                if(i+1<n && s.charAt(i+1) == ')'){
                     i+=2;
                 }else{
                     openNeeded++;
