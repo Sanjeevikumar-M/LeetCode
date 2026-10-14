@@ -1,16 +1,13 @@
 class Solution:
     def convert(self, s: str, numRows: int) -> str:
-        if numRows == 1 or numRows >= len(s):
+        if numRows==1 or numRows>len(s):
             return s
         l = ['']*numRows
-        curr_row = 0
-        going_down = False
-
-        for char in s:
-            l[curr_row] += char
-
-            if curr_row == 0 or curr_row == numRows - 1:
-                going_down = not going_down
-            
-            curr_row += 1 if going_down else -1
+        downDir = False
+        curr = 0
+        for i in s:
+            l[curr] += i
+            if curr==0 or curr==numRows-1:
+                downDir = not downDir
+            curr += 1 if downDir else -1
         return ''.join(l)
