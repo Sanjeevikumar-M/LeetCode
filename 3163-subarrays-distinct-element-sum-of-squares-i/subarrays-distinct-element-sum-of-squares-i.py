@@ -7,5 +7,5 @@ class Solution:
             for j in range(i,n):
                 seen.add(nums[j])
                 count = len(seen)
-                ans+=count**2
+                ans+=count*count
         return ans
