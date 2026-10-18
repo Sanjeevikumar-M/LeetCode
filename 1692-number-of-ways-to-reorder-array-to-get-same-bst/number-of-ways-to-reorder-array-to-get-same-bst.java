@@ -1,29 +1,52 @@
 class Solution {
-    private static final long MOD = 1_000_000_007L;
-    private long[][] C;
-
-    private long ways(List<Integer> a) {
-        int n = a.size();
-        if (n <= 2) return 1;
-        List<Integer> l = new ArrayList<>(), r = new ArrayList<>();
-        int root = a.get(0);
-        for (int i = 1; i < n; i++) {
-            if (a.get(i) < root) l.add(a.get(i));
-            else r.add(a.get(i));
-        }
-        return C[n - 1][l.size()] * ways(l) % MOD * ways(r) % MOD;
-    }
+    private static final int MOD = 1_000_000_007;
 
     public int numOfWays(int[] nums) {
         int n = nums.length;
-        C = new long[n + 1][n + 1];
-        for (int i = 0; i <= n; i++) {
-            C[i][0] = 1;
-            for (int j = 1; j <= i; j++)
-                C[i][j] = (C[i - 1][j - 1] + C[i - 1][j]) % MOD;
+        int[] prev = new int[n + 2];
+        int[] next = new int[n + 2];
+        int[] size = new int[n + 2];
+        for (int i = 0; i < n + 2; i++) {
+            prev[i] = i - 1;
+            next[i] = i + 1;
         }
-        List<Integer> list = new ArrayList<>();
-        for (int x : nums) list.add(x);
-        return (int) ((ways(list) - 1 + MOD) % MOD);
+        long fac = 1; 
+        long prod = 1;
+
+        for (int i = n - 1; i >= 0; i--) {
+            fac = fac * (i + 1) % MOD;
+
+            int x = nums[i];
+            size[x] = 1;
+            int left = prev[x];
+            if (size[left] > 0) {
+                size[x] += size[left];
+                int pl = prev[left];
+                prev[x] = pl;
+                next[pl] = x;
+            }
+
+            int right = next[x];
+            if (size[right] > 0) {
+                size[x] += size[right];
+                int nr = next[right];
+                prev[nr] = x;
+                next[x] = nr;
+            }
+
+            prod = prod * size[x] % MOD;
+        }
+
+        return (int) ((fac * pow(prod, MOD - 2) - 1 + MOD) % MOD);
+    }
+
+    private long pow(long x, int n) {
+        long res = 1;
+        for (; n > 0; n /= 2) {
+            if (n % 2 > 0) 
+                res = res * x % MOD;
+            x = x * x % MOD;
+        }
+        return res;
     }
 }
