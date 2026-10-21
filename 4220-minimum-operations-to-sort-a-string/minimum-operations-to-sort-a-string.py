@@ -1,14 +1,20 @@
 class Solution:
     def minOperations(self, s: str) -> int:
-        n = len(s)
-        if all(s[i] <= s[i + 1] for i in range(n - 1)):
-            return 0
-        if n == 2:
-            return -1
-        mn = min(s)
-        mx = max(s)
-        if s[0] == mn or s[-1] == mx:
-            return 1
-        if any(c == mn or c == mx for c in s[1:-1]):
-            return 2
-        return 3
+
+        if len(s) == 2 and s[0] > s[1]:
+            return -1                       #  ans = -1
+
+        for ch1, ch2 in pairwise(s):
+            if ch1 > ch2: break
+        else: return 0                      #   ans = 0
+
+        mn, mx = min(s[1:-1]), max(s[1:-1])
+        lft, rgt = s[0], s[~0]
+
+        if lft <= min(rgt, mn) or rgt >= max(lft, mx):
+            return 1                        #   ans = 1
+
+        elif rgt >= mn or lft <= mx:
+            return 2                        #   ans = 2
+
+        else: return 3                      #   ans = 3
