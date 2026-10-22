@@ -1,16 +1,21 @@
 class Solution:
-    def minOperations(self, A: List[int]) -> int:
-        n = len(A)
-        asc = dsc = 1
+    def minOperations(self, nums: List[int]) -> int:
+        n = len(nums)
+        if n == 0:
+            return -1
+        
+        res = float('inf')
+        target = list(range(n))
+        k = nums.index(0)
+        if nums[k:] + nums[:k] == target:
+            res = min(res, k, n - k + 2)
 
-        for i in range(1, n):
-            asc += A[i] == (A[i - 1] + 1) % n
-            dsc += A[i - 1] == (A[i] + 1) % n
-
-        if asc == n:
-            return 0 if not A[0] else min(n - A[0], A[0] + 2)
-
-        if dsc == n:
-            return min(n - A[-1], A[-1]) + 1
-
-        return -1
+        rev_nums = nums[::-1]
+        k_rev = rev_nums.index(0)
+        if rev_nums[k_rev:] + rev_nums[:k_rev] == target:
+            res = min(res, k_rev + 1, n - k_rev + 1)
+            
+        if res == float('inf'):
+            return -1
+        
+        return int(res)
