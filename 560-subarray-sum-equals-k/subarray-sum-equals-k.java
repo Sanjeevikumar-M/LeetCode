@@ -6,9 +6,7 @@ class Solution {
         int count = 0;
         for(int n:nums){
             total += n;
-            if(subsum.containsKey(total-k)){
-                count += subsum.get(total-k);
-            }
+            count += subsum.getOrDefault(total-k,0);
             subsum.put(total,subsum.getOrDefault(total,0)+1);
         }
         return count;
