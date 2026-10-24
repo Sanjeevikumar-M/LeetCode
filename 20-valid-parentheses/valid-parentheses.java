@@ -1,24 +1,20 @@
 class Solution {
     public boolean isValid(String s) {
-        if (s.length() % 2 != 0) return false;
-
-        char[] stack = new char[s.length()];
-        int head = 0;
-
-        for (char c : s.toCharArray()) {
-            if (c == '(') {
-                stack[head++] = ')';
-            } else if (c == '{') {
-                stack[head++] = '}';
-            } else if (c == '[') {
-                stack[head++] = ']';
-            } else {
-                if (head == 0 || stack[--head] != c) {
-                    return false;
-                }
+        int n = s.length();
+        if(n%2 != 0) return false;
+        char[] ch = new char[n];
+        int idx = 0;
+        for(char c:s.toCharArray()){
+            if(c=='('){
+                ch[idx++] = ')';
+            }else if(c=='{'){
+                ch[idx++] = '}';
+            }else if(c=='['){
+                ch[idx++] = ']';
+            }else if(idx == 0 || ch[--idx]!=c){
+                return false;
             }
         }
-
-        return head == 0;
+        return idx==0;
     }
 }
