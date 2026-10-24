@@ -4,7 +4,6 @@ class Solution:
         t = c = 0
         for n in nums:
             t+=n
-            if t-k in s:
-                c += s[t-k]
+            c += s.get(t-k,0)
             s[t] = s.get(t,0)+1
         return c
