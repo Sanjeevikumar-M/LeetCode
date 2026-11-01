@@ -12,6 +12,5 @@ class Solution {
             moves += num - min;
         }
         return moves;
-
     }
 }
