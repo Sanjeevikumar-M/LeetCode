@@ -1,67 +1,79 @@
-class Window {
-    private final int[] nums;
-    private final int x, odd;
-    private final Comparator<Integer> order;  // by value, then by index
-    private final TreeSet<Integer> s;         // indices of the window
-    private int mid;                          // index of the (h+1)-th smallest: everything before it is the low half
-    private long low, total;
-
-    Window(int[] nums, int x) {
-        this.nums = nums;
-        this.x = x;
-        odd = x & 1;
-        order = (a, b) -> nums[a] != nums[b] ? Integer.compare(nums[a], nums[b]) : Integer.compare(a, b);
-        s = new TreeSet<>(order);
-        for (int i = 0; i < x; i++) {
-            s.add(i);
-            total += nums[i];
-        }
-        Iterator<Integer> it = s.iterator();
-        for (int i = 0; i < x / 2; i++)
-            low += nums[it.next()];
-        mid = it.next();
-    }
-
-    long cost() {  // larger half minus smaller half
-        return total - 2 * low - (long) odd * nums[mid];
-    }
-
-    long slide(int in) {
-        int out = in - x;
-        s.add(in);
-        if (order.compare(in, mid) < 0) {  // in joins the low half and pushes its largest up
-            mid = s.lower(mid);
-            low += nums[in] - nums[mid];
-        }
-        if (order.compare(out, mid) < 0) {  // out leaves the low half: mid moves down into it
-            low += nums[mid] - nums[out];
-            mid = s.higher(mid);
-        } else if (out == mid) {
-            mid = s.higher(mid);
-        }
-        s.remove(out);
-        total += nums[in] - nums[out];
-        return cost();
-    }
-}
-
 class Solution {
+    int size;
+    long[] cntTree;
+    long[] sumTree;
+
     public long minOperations(int[] nums, int x, int k) {
         int n = nums.length;
-        Window win = new Window(nums, x);
-        long[] cost = new long[n - x + 1];
-        cost[0] = win.cost();
-        for (int i = x; i < n; i++)
-            cost[i - x + 1] = win.slide(i);
-
-        long[] best = new long[n + 1];  // best[i]: min ops for the windows placed so far inside nums[0..i)
-        for (int j = 0; j < k; j++) {
-            long[] layer = new long[n + 1];
-            Arrays.fill(layer, 0, x, Long.MAX_VALUE / 2);
-            for (int i = x; i <= n; i++)
-                layer[i] = Math.min(layer[i - 1], best[i - x] + cost[i - x]);
-            best = layer;
+        int[] sorted = nums.clone();
+        Arrays.sort(sorted);
+        int m = 0;
+        for (int i = 0; i < n; i++) {
+            if (m == 0 || sorted[m - 1] != sorted[i]) {
+                sorted[m++] = sorted[i];
+            }
         }
-        return best[n];
+        int[] vals = Arrays.copyOf(sorted, m);
+        int[] rank = new int[n];
+        for (int i = 0; i < n; i++) {
+            rank[i] = Arrays.binarySearch(vals, nums[i]) + 1;
+        }
+        size = m;
+        cntTree = new long[m + 1];
+        sumTree = new long[m + 1];
+        int windows = n - x + 1;
+        long[] cost = new long[windows];
+        int half = (x + 1) / 2;
+        long total = 0;
+        for (int i = 0; i < n; i++) {
+            add(rank[i], 1, nums[i]);
+            total += nums[i];
+            if (i >= x) {
+                add(rank[i - x], -1, -nums[i - x]);
+                total -= nums[i - x];
+            }
+            if (i >= x - 1) {
+                int pos = 0;
+                long cntBelow = 0;
+                long sumBelow = 0;
+                int step = Integer.highestOneBit(m);
+                while (step > 0) {
+                    int nxt = pos + step;
+                    if (nxt <= m && cntBelow + cntTree[nxt] < half) {
+                        pos = nxt;
+                        cntBelow += cntTree[nxt];
+                        sumBelow += sumTree[nxt];
+                    }
+                    step >>= 1;
+                }
+                long med = vals[pos];
+                long leftCnt = half;
+                long leftSum = sumBelow + (half - cntBelow) * med;
+                long rightCnt = x - leftCnt;
+                long rightSum = total - leftSum;
+                cost[i - x + 1] = med * leftCnt - leftSum + rightSum - med * rightCnt;
+            }
+        }
+        long inf = Long.MAX_VALUE / 4;
+        long[] prev = new long[n + 1];
+        long[] cur = new long[n + 1];
+        for (int j = 1; j <= k; j++) {
+            Arrays.fill(cur, 0, n + 1, inf);
+            for (int i = j * x; i <= n; i++) {
+                long take = (j == 1 ? 0 : prev[i - x]) + cost[i - x];
+                cur[i] = Math.min(cur[i - 1], take);
+            }
+            long[] tmp = prev;
+            prev = cur;
+            cur = tmp;
+        }
+        return prev[n];
+    }
+
+    void add(int i, int c, long v) {
+        for (; i <= size; i += i & -i) {
+            cntTree[i] += c;
+            sumTree[i] += v;
+        }
     }
 }
