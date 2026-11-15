@@ -1,7 +1,14 @@
 class Solution {
     public int numOfSubarrays(int[] arr) {
-        Arrays.parallelPrefix(arr, Integer::sum);  // arr becomes its own prefix sums, in place
-        long odd = Arrays.stream(arr).map(p -> p & 1).sum();  // odd prefix sums
-        return (int) (odd * (arr.length + 1 - odd) % 1_000_000_007);  // the empty prefix is even
+        
+        int sum = 0;
+        long prefOdds = 0;
+        for(int i = 0; i < arr.length; i++) {
+            sum += arr[i];
+            prefOdds += sum % 2;
+        }
+        prefOdds += (arr.length - prefOdds) * prefOdds;
+        return (int) (prefOdds % 1000000007);
     }
 }
+
